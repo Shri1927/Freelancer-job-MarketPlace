@@ -3,6 +3,8 @@ import './App.css'
 import Navbar from '../components/Navbar.jsx'
 import Footer from '../components/Footer.jsx'
 import Home from '../pages/Home.jsx'
+import SignIn from '../pages/SignIn.jsx'
+import SignUp from '../pages/SignUp.jsx'
 
 import { useAuthStore } from '../store/auth.js'
 
@@ -20,6 +22,8 @@ function App() {
       <main className="flex-1">
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/signin" element={<SignIn />} />
+          <Route path="/signup" element={<SignUp />} />
        
         </Routes>
       </main>
