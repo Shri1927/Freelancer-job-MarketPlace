@@ -1,18 +1,23 @@
+// SignUp.jsx
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store/auth';
-import { Eye, EyeOff, User, Mail, Lock, Briefcase } from 'lucide-react';
+import { Eye, EyeOff, User, Mail, Lock } from 'lucide-react';
 
 export default function SignUp() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { signUp, signInWithGoogle, signInWithFacebook } = useAuthStore();
+
+  // Get role from state (from RoleSelector or from SignIn) or default to 'freelancer'
+  const role = location.state?.role || 'freelancer';
 
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
     confirmPassword: '',
-    role: 'freelancer'
+    role: role // Set the role from state
   });
 
   const [showPassword, setShowPassword] = useState(false);
@@ -81,12 +86,30 @@ export default function SignUp() {
     }
   };
 
+  // Dynamic content based on role
+  const roleConfig = {
+    client: {
+      title: 'Create your client account',
+      subtitle: 'Join FreelanceHub and start hiring freelancers',
+      signinText: 'Sign in to your client account',
+      signinLink: '/signin'
+    },
+    freelancer: {
+      title: 'Create your account',
+      subtitle: 'Join FreelanceHub and start your journey',
+      signinText: 'Sign in to your account',
+      signinLink: '/signin'
+    }
+  };
+
+  const config = roleConfig[role];
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Create your account</h1>
-          <p className="text-gray-600">Join FreelanceHub and start your journey</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">{config.title}</h1>
+          <p className="text-gray-600">{config.subtitle}</p>
         </div>
 
         <div className="bg-white rounded-2xl shadow-xl p-8">
@@ -135,25 +158,8 @@ export default function SignUp() {
               </div>
             </div>
 
-            <div>
-              <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-2">
-                I want to
-              </label>
-              <div className="relative">
-                <Briefcase className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <select
-                  id="role"
-                  name="role"
-                  value={formData.role}
-                  onChange={handleChange}
-                  className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none appearance-none bg-white"
-                  required
-                >
-                  <option value="freelancer">Work as a Freelancer</option>
-                  <option value="client">Hire Freelancers</option>
-                </select>
-              </div>
-            </div>
+            {/* Hidden role field - we don't show the selector since role is already determined */}
+            <input type="hidden" name="role" value={formData.role} />
 
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
@@ -269,8 +275,12 @@ export default function SignUp() {
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
               Already have an account?{' '}
-              <Link to="/signin" className="text-blue-600 hover:text-blue-700 font-medium">
-                Sign in
+              <Link 
+                to={config.signinLink} 
+                state={{ role }} // Pass the current role to signin
+                className="text-blue-600 hover:text-blue-700 font-medium"
+              >
+                {config.signinText}
               </Link>
             </p>
           </div>

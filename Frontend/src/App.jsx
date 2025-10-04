@@ -5,6 +5,7 @@ import Footer from '../components/Footer.jsx'
 import Home from '../pages/Home.jsx'
 import SignIn from '../pages/SignIn.jsx'
 import SignUp from '../pages/SignUp.jsx'
+import RoleSelector from '../pages/RoleSelector.jsx'
 
 import { useAuthStore } from '../store/auth.js'
 
@@ -24,6 +25,8 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
+          <Route path="/role" element={<RoleSelector />} />
+
        
         </Routes>
       </main>

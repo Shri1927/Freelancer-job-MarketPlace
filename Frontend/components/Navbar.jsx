@@ -28,9 +28,11 @@ export default function Navbar() {
           <div className="hidden md:flex items-center gap-3">
             {!isAuthenticated ? (
               <>
-              <input type="text" placeholder="Search" className="px-3 py-2 text-sm font-medium text-gray-700 border border-gray-300 rounded-md" />
-                <Link to="/signin" className="px-3 py-2 text-sm font-medium text-gray-700">Sign in</Link>
-                <Link to="/signup" className="px-3 py-2 text-sm font-medium bg-primary-600 text-white rounded-md hover:bg-primary-700">Sign up</Link>
+                <input type="text" placeholder="Search" className="px-3 py-2 text-sm font-medium text-gray-700 border border-gray-300 rounded-md" />
+                <Link to="/role" className="px-3 py-2 text-sm font-medium text-gray-700"  state={{ mode: 'signin' }} onClick={() => setOpen(false)}>Sign in</Link>
+                <Link to="/role" className="px-3 py-2 text-sm font-medium bg-primary-600 text-white rounded-md hover:bg-primary-700" state={{ mode: 'signup' }} onClick={() => setOpen(false)}>Sign up</Link>
+               
+               
               </>
             ) : (
               <div className="flex items-center gap-3">
@@ -64,8 +66,22 @@ export default function Navbar() {
             <div className="h-px bg-gray-200 my-2" />
             {!isAuthenticated ? (
               <>
-                <Link to="/signin" className="px-3 py-2 text-sm" onClick={() => setOpen(false)}>Sign in</Link>
-                <Link to="/signup" className="px-3 py-2 text-sm bg-primary-600 text-white rounded-md" onClick={() => setOpen(false)}>Sign up</Link>
+                <Link
+                  to="/role-selector"
+                  state={{ mode: 'signin' }}
+                  className="px-3 py-2 text-sm"
+                  onClick={() => setOpen(false)}
+                >
+                  Sign in
+                </Link>
+                <Link
+                  to="/role-selector"
+                  state={{ mode: 'signup' }}
+                  className="px-3 py-2 text-sm bg-primary-600 text-white rounded-md"
+                  onClick={() => setOpen(false)}
+                >
+                  Sign up
+                </Link>
               </>
             ) : (
               <>

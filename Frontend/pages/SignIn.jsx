@@ -1,11 +1,16 @@
+// SignIn.jsx
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store/auth';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 
 export default function SignIn() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { signIn, signInWithGoogle, signInWithFacebook } = useAuthStore();
+
+  // Get role from state or default to 'freelancer'
+  const role = location.state?.role || 'freelancer';
 
   const [formData, setFormData] = useState({
     email: '',
@@ -62,12 +67,30 @@ export default function SignIn() {
     }
   };
 
+  // Dynamic content based on role
+  const roleConfig = {
+    client: {
+      title: 'Welcome back, Client',
+      subtitle: 'Sign in to your FreelanceHub client account',
+      signupText: 'Create a free client account',
+      signupLink: '/signup'
+    },
+    freelancer: {
+      title: 'Welcome back',
+      subtitle: 'Sign in to your FreelanceHub account',
+      signupText: 'Create a free account',
+      signupLink: '/signup'
+    }
+  };
+
+  const config = roleConfig[role];
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome back</h1>
-          <p className="text-gray-600">Sign in to your FreelanceHub account</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">{config.title}</h1>
+          <p className="text-gray-600">{config.subtitle}</p>
         </div>
 
         <div className="bg-white rounded-2xl shadow-xl p-8">
@@ -204,16 +227,19 @@ export default function SignIn() {
                 <div className="w-full border-t border-gray-300"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">New to FreelanceHub?</span>
+                <span className="px-2 bg-white text-gray-500">
+                  {role === 'client' ? 'New to FreelanceHub as a client?' : 'New to FreelanceHub?'}
+                </span>
               </div>
             </div>
 
             <div className="mt-6 text-center">
               <Link
-                to="/signup"
+                to={config.signupLink}
+                state={{ role }} // Pass the current role to signup
                 className="text-blue-600 hover:text-blue-700 font-medium text-sm"
               >
-                Create a free account
+                {config.signupText}
               </Link>
             </div>
           </div>
