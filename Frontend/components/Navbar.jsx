@@ -67,7 +67,7 @@ export default function Navbar() {
             {!isAuthenticated ? (
               <>
                 <Link
-                  to="/role-selector"
+                  to="/role"
                   state={{ mode: 'signin' }}
                   className="px-3 py-2 text-sm"
                   onClick={() => setOpen(false)}
@@ -75,7 +75,7 @@ export default function Navbar() {
                   Sign in
                 </Link>
                 <Link
-                  to="/role-selector"
+                  to="/role"
                   state={{ mode: 'signup' }}
                   className="px-3 py-2 text-sm bg-primary-600 text-white rounded-md"
                   onClick={() => setOpen(false)}
