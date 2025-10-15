@@ -1,0 +1,110 @@
+[
+  {
+    "id": "1",
+    "title": "Full Stack Developer for E-commerce Platform",
+    "description": "We are looking for an experienced full stack developer to build a modern e-commerce platform with React and Node.js. The project includes payment integration, user authentication, and admin dashboard.",
+    "budget": "$5000 - $8000",
+    "duration": "2-3 months",
+    "skillsRequired": ["React", "Node.js", "MongoDB", "Payment Integration", "REST API"],
+    "client": {
+      "name": "TechStart Inc",
+      "rating": 4.8,
+      "totalJobs": 24,
+      "verified": true
+    },
+    "postedDate": "2024-01-15",
+    "proposals": 12,
+    "category": "Web Development",
+    "experienceLevel": "Intermediate"
+  },
+  {
+    "id": "2",
+    "title": "Mobile App UI/UX Design",
+    "description": "Need a talented UI/UX designer to create modern, user-friendly designs for our fitness tracking mobile app. Must have experience with mobile design patterns and Figma.",
+    "budget": "$2000 - $3500",
+    "duration": "1 month",
+    "skillsRequired": ["Figma", "UI/UX Design", "Mobile Design", "Prototyping"],
+    "client": {
+      "name": "FitLife Solutions",
+      "rating": 4.9,
+      "totalJobs": 15,
+      "verified": true
+    },
+    "postedDate": "2024-01-18",
+    "proposals": 8,
+    "category": "Design",
+    "experienceLevel": "Expert"
+  },
+  {
+    "id": "3",
+    "title": "Content Writer for Tech Blog",
+    "description": "Looking for a skilled content writer to produce high-quality articles about web development, AI, and emerging technologies. Must have strong SEO knowledge.",
+    "budget": "$500 - $1000",
+    "duration": "Ongoing",
+    "skillsRequired": ["Content Writing", "SEO", "Technical Writing", "Research"],
+    "client": {
+      "name": "DevInsights",
+      "rating": 4.7,
+      "totalJobs": 32,
+      "verified": true
+    },
+    "postedDate": "2024-01-20",
+    "proposals": 15,
+    "category": "Writing",
+    "experienceLevel": "Intermediate"
+  },
+  {
+    "id": "4",
+    "title": "Python Backend Developer for AI Integration",
+    "description": "Seeking an experienced Python developer to integrate AI models into our existing platform. Experience with FastAPI, machine learning, and cloud deployment required.",
+    "budget": "$6000 - $10000",
+    "duration": "3-4 months",
+    "skillsRequired": ["Python", "FastAPI", "Machine Learning", "AWS", "Docker"],
+    "client": {
+      "name": "AI Innovations Lab",
+      "rating": 5.0,
+      "totalJobs": 8,
+      "verified": true
+    },
+    "postedDate": "2024-01-22",
+    "proposals": 6,
+    "category": "AI & ML",
+    "experienceLevel": "Expert"
+  },
+  {
+    "id": "5",
+    "title": "WordPress Website Redesign",
+    "description": "Need a WordPress expert to redesign our company website. Must be responsive, SEO-friendly, and include a blog section with custom post types.",
+    "budget": "$1500 - $2500",
+    "duration": "3-4 weeks",
+    "skillsRequired": ["WordPress", "PHP", "CSS", "Responsive Design", "SEO"],
+    "client": {
+      "name": "GreenLeaf Consulting",
+      "rating": 4.6,
+      "totalJobs": 19,
+      "verified": false
+    },
+    "postedDate": "2024-01-23",
+    "proposals": 20,
+    "category": "Web Development",
+    "experienceLevel": "Intermediate"
+  },
+  {
+    "id": "6",
+    "title": "Video Editor for YouTube Content",
+    "description": "Looking for a creative video editor for our tech YouTube channel. Must be proficient in Adobe Premiere Pro or DaVinci Resolve. Weekly content required.",
+    "budget": "$800 - $1200/month",
+    "duration": "Ongoing",
+    "skillsRequired": ["Video Editing", "Adobe Premiere Pro", "Motion Graphics", "Color Grading"],
+    "client": {
+      "name": "TechTalks Media",
+      "rating": 4.8,
+      "totalJobs": 12,
+      "verified": true
+    },
+    "postedDate": "2024-01-24",
+    "proposals": 10,
+    "category": "Video & Animation",
+    "experienceLevel": "Intermediate"
+  }
+]
