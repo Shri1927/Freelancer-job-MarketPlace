@@ -1,0 +1,30 @@
+[
+  {
+    "id": "1",
+    "name": "John Smith",
+    "email": "john.smith@example.com",
+    "role": "Full Stack Developer",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=John",
+    "rating": 4.9,
+    "completedProjects": 45,
+    "skills": ["React", "Node.js", "TypeScript", "MongoDB", "AWS"],
+    "hourlyRate": "$75",
+    "bio": "Experienced full stack developer with 8+ years of experience building scalable web applications.",
+    "location": "San Francisco, CA",
+    "joinedDate": "2020-03-15"
+  },
+  {
+    "id": "2",
+    "name": "Sarah Johnson",
+    "email": "sarah.j@example.com",
+    "role": "UI/UX Designer",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah",
+    "rating": 5.0,
+    "completedProjects": 32,
+    "skills": ["Figma", "Adobe XD", "UI Design", "Prototyping", "User Research"],
+    "hourlyRate": "$60",
+    "bio": "Creative designer passionate about crafting beautiful and intuitive user experiences.",
+    "location": "New York, NY",
+    "joinedDate": "2019-08-22"
+  }
+]

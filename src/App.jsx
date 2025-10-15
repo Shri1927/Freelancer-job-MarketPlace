@@ -1,38 +1,40 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
-import './App.css'
-import Navbar from '../components/Navbar.jsx'
-import Footer from '../components/Footer.jsx'
-import Home from '../pages/Home.jsx'
-import SignIn from '../pages/SignIn.jsx'
-import SignUp from '../pages/SignUp.jsx'
-import RoleSelector from '../pages/RoleSelector.jsx'
+import { Toaster } from "@/components/ui/toaster"
+import { Toaster as Sonner } from "@/components/ui/sonner"
+import { TooltipProvider } from "@/components/ui/tooltip"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import { BrowserRouter, Routes, Route } from "react-router-dom"
+import Landing from "./pages/Landing.jsx"
+import SignIn from "./pages/SignIn.jsx"
+import SignUp from "./pages/SignUp.jsx"
+import Jobs from "./pages/Jobs.jsx"
+import JobDetail from "./pages/JobDetail.jsx"
+import Dashboard from "./pages/Dashboard.jsx"
+import Profile from "./pages/Profile.jsx"
+import NotFound from "./pages/NotFound.jsx"
 
-import { useAuthStore } from '../store/auth.js'
 
-function ProtectedRoute({ children, role }) {
-  const { isAuthenticated, user } = useAuthStore()
-  if (!isAuthenticated) return <Navigate to="/signin" replace />
-  if (role && user?.role !== role) return <Navigate to="/" replace />
-  return children
-}
+const queryClient = new QueryClient()
 
-function App() {
-  return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar />
-      <main className="flex-1">
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <TooltipProvider>
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Landing />} />
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
-          <Route path="/role" element={<RoleSelector />} />
-
-       
+          <Route path="/jobs" element={<Jobs />} />
+          <Route path="/jobs/:id" element={<JobDetail />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/profile" element={<Profile />} />
+          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="*" element={<NotFound />} />
         </Routes>
-      </main>
-      <Footer />
-    </div>
-  )
-}
+      </BrowserRouter>
+    </TooltipProvider>
+  </QueryClientProvider>
+)
 
 export default App
