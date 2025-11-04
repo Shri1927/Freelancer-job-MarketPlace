@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Search, Briefcase, Users, TrendingUp, CheckCircle, Star } from "lucide-react";
@@ -27,6 +28,19 @@ const Landing = () => {
       title: "Grow Your Career",
       description: "Build your portfolio and increase your earning potential"
     }
+  ];
+
+  const categories = [
+    { icon: "</>", title: "Development & IT" },
+    { icon: "🎨", title: "Design & Creative" },
+    { icon: "⚙️", title: "AI Services" },
+    { icon: "🤝", title: "Sales & Marketing" },
+    { icon: "✍️", title: "Writing & Translation" },
+    { icon: "🧰", title: "Admin & Support" },
+    { icon: "🏛️", title: "Finance & Accounting" },
+    { icon: "⚖️", title: "Legal" },
+    { icon: "👥", title: "HR & Training" },
+    { icon: "🛠️", title: "Engineering & Architecture" }
   ];
 
   const stats = [
@@ -56,29 +70,39 @@ const Landing = () => {
       <Navbar />
       
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-hero py-20 md:py-32">
+      <section className="relative overflow-hidden bg-gradient-hero py-16 md:py-24">
         <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-              Find Your Next{" "}
-              <span className="bg-gradient-primary bg-clip-text text-transparent">
-                Great Project
-              </span>
-            </h1>
-            <p className="text-lg md:text-xl text-muted-foreground mb-8">
-              Connect with top freelancers or find your dream job. Join thousands of professionals building their success on FreelanceHub.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/jobs">
-                <Button size="lg" className="bg-gradient-primary hover:opacity-90 w-full sm:w-auto">
-                  Find Jobs
-                </Button>
-              </Link>
-              <Link to="/signup">
-                <Button size="lg" variant="outline" className="w-full sm:w-auto">
-                  Get Started
-                </Button>
-              </Link>
+          <div className="grid lg:grid-cols-[1fr,520px] gap-10 items-center">
+            <div>
+              <p className="inline-block rounded-full bg-secondary px-4 py-1 text-sm font-medium text-foreground/80 mb-4">
+                Stop doing everything. Get access to the top 1% with Business Plus.
+              </p>
+              <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+                Connecting clients in need to freelancers who
+                <span className="block bg-gradient-primary bg-clip-text text-transparent">deliver</span>
+              </h1>
+              <div className="mt-6 bg-foreground/90 text-background rounded-2xl p-4 md:p-6 shadow-lg max-w-xl">
+                <div className="flex gap-2 text-sm mb-4">
+                  <button className="flex-1 rounded-full bg-background text-foreground px-4 py-2 font-medium">
+                    Find talent
+                  </button>
+                  <button className="flex-1 rounded-full/ bg-transparent text-background/80 px-4 py-2 font-medium opacity-80">
+                    Browse jobs
+                  </button>
+                </div>
+                <div className="flex gap-2 items-center">
+                  <Input placeholder="Search by role, skills, or keywords" className="bg-background text-foreground" />
+                  <Button className="bg-gradient-primary px-6">Search</Button>
+                </div>
+                <div className="mt-3 flex items-center gap-6 opacity-80 text-xs">
+                  <span>Microsoft</span>
+                  <span>airbnb</span>
+                  <span>Glassdoor</span>
+                </div>
+              </div>
+            </div>
+            <div className="hidden lg:block rounded-3xl overflow-hidden shadow-large">
+              <div className="aspect-[4/3] bg-gradient-primary/30" />
             </div>
           </div>
         </div>
@@ -95,6 +119,23 @@ const Landing = () => {
                 </div>
                 <div className="text-sm text-muted-foreground">{stat.label}</div>
               </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Explore Categories */}
+      <section className="py-20">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl md:text-4xl font-bold mb-6">Explore millions of pros</h2>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+            {categories.map((cat, i) => (
+              <Card key={i} className="p-6 hover:shadow-medium transition-all">
+                <div className="w-12 h-12 rounded-xl border border-border flex items-center justify-center text-2xl mb-3 bg-secondary">
+                  {cat.icon}
+                </div>
+                <div className="font-medium">{cat.title}</div>
+              </Card>
             ))}
           </div>
         </div>
@@ -175,6 +216,38 @@ const Landing = () => {
                 </div>
               </Card>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing */}
+      <section className="py-20">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl md:text-4xl font-bold mb-10 text-center">Clients only pay after hiring</h2>
+          <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+            <Card className="p-8">
+              <h3 className="text-2xl font-semibold mb-1">Basic</h3>
+              <p className="text-sm text-muted-foreground mb-6">For starting out</p>
+              <p className="font-medium mb-6">5% Service fee after hiring</p>
+              <ul className="space-y-3 text-sm text-muted-foreground mb-8">
+                <li>AI-powered features</li>
+                <li>Collaboration and project tracking tools</li>
+                <li>Pay as work is completed</li>
+              </ul>
+              <Button variant="outline" className="w-full">Get started for free</Button>
+            </Card>
+            <Card className="p-8 border-2" style={{ borderColor: "hsl(var(--primary))" }}>
+              <div className="inline-flex items-center gap-2 rounded-full bg-secondary px-3 py-1 text-xs font-medium mb-4">POPULAR</div>
+              <h3 className="text-2xl font-semibold mb-1">Business Plus</h3>
+              <p className="text-sm text-muted-foreground mb-6">For growing</p>
+              <p className="font-medium mb-6">10% Service fee after hiring</p>
+              <ul className="space-y-3 text-sm text-muted-foreground mb-8">
+                <li>Instant access to pre-vetted top 1% of talent</li>
+                <li>Uma Recruiter</li>
+                <li>Teams controls</li>
+              </ul>
+              <Button className="w-full bg-gradient-primary">Get started for free</Button>
+            </Card>
           </div>
         </div>
       </section>
