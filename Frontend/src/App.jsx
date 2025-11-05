@@ -11,6 +11,12 @@ import JobDetail from "./pages/JobDetail.jsx"
 import Dashboard from "./pages/Dashboard.jsx"
 import Profile from "./pages/Profile.jsx"
 import NotFound from "./pages/NotFound.jsx"
+import PostJob from "./pages/PostJob.jsx"
+import InviteFreelancers from "./pages/InviteFreelancers.jsx"
+import Messages from "./pages/Messages.jsx"
+import CreateContract from "./pages/CreateContract.jsx"
+import Workroom from "./pages/Workroom.jsx"
+import Feedback from "./pages/Feedback.jsx"
 
 
 const queryClient = new QueryClient()
@@ -27,6 +33,12 @@ const App = () => (
           <Route path="/signup" element={<SignUp />} />
           <Route path="/jobs" element={<Jobs />} />
           <Route path="/jobs/:id" element={<JobDetail />} />
+          <Route path="/post-job" element={<PostJob />} />
+          <Route path="/invitations" element={<InviteFreelancers />} />
+          <Route path="/messages" element={<Messages />} />
+          <Route path="/contract" element={<CreateContract />} />
+          <Route path="/workroom" element={<Workroom />} />
+          <Route path="/feedback" element={<Feedback />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/profile" element={<Profile />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
