@@ -8,7 +8,7 @@ import SignIn from "./pages/SignIn.jsx"
 import SignUp from "./pages/SignUp.jsx"
 import Jobs from "./pages/Jobs.jsx"
 import JobDetail from "./pages/JobDetail.jsx"
-import Dashboard from "./pages/Dashboard.jsx"
+import DashboardRouter from "./pages/DashboardRouter.jsx"
 import Profile from "./pages/Profile.jsx"
 import NotFound from "./pages/NotFound.jsx"
 import PostJob from "./pages/PostJob.jsx"
@@ -39,7 +39,7 @@ const App = () => (
           <Route path="/contract" element={<CreateContract />} />
           <Route path="/workroom" element={<Workroom />} />
           <Route path="/feedback" element={<Feedback />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard" element={<DashboardRouter />} />
           <Route path="/profile" element={<Profile />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
