@@ -1,11 +1,14 @@
-import { Link, useLocation } from "react-router-dom"
+import { Link, NavLink, useNavigate, useLocation } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { Briefcase, Menu, X } from "lucide-react"
 import { useState } from "react"
+import { useAuthStore } from "../store/auth"
 
 const Navbar = () => {
   const location = useLocation()
+  const navigate = useNavigate()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const { isAuthenticated, user, signOut } = useAuthStore()
 
   const isActive = path => location.pathname === path
 
@@ -14,7 +17,14 @@ const Navbar = () => {
     { path: "/jobs", label: "Find Jobs" },
     { path: "/post-job", label: "Post Job" },
     { path: "/dashboard", label: "Dashboard" }
+
   ]
+
+  const handleSignOut = () => {
+    signOut()
+    navigate('/')
+    setMobileMenuOpen(false)
+  }
 
   return (
     <nav className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
@@ -45,14 +55,53 @@ const Navbar = () => {
           </div>
 
           <div className="hidden md:flex items-center gap-4">
-            <Link to="/signin">
-              <Button variant="ghost">Sign In</Button>
-            </Link>
-            <Link to="/signup">
-              <Button className="bg-gradient-primary hover:opacity-90">
-                Sign Up
-              </Button>
-            </Link>
+            {!isAuthenticated ? (
+              <>
+                <input 
+                  type="text" 
+                  placeholder="Search" 
+                  className="px-3 py-2 text-sm font-medium text-foreground border border-input rounded-md bg-background" 
+                />
+                <Link to="/role" state={{ mode: 'signin' }}>
+                  <Button variant="ghost">Sign In</Button>
+                </Link>
+                <Link to="/role" state={{ mode: 'signup' }}>
+                  <Button className="bg-gradient-primary hover:opacity-90">
+                    Sign Up
+                  </Button>
+                </Link>
+              </>
+            ) : (
+              <div className="flex items-center gap-4">
+                <input 
+                  type="text" 
+                  placeholder="Search" 
+                  className="px-3 py-2 text-sm font-medium text-foreground border border-input rounded-md bg-background" 
+                />
+                <Link to="/messages">
+                  <Button variant="ghost" className={isActive('/messages') ? 'text-primary' : ''}>
+                    Messages
+                  </Button>
+                </Link>
+                <Link to="/profile">
+                  <Button variant="ghost" className={isActive('/profile') ? 'text-primary' : ''}>
+                    Profile
+                  </Button>
+                </Link>
+                <Link to={user?.role === 'client' ? "/dashboard/client" : "/dashboard/freelancer"}>
+                  <Button variant="ghost" className={isActive('/dashboard') ? 'text-primary' : ''}>
+                    Dashboard
+                  </Button>
+                </Link>
+                <Button
+                  variant="ghost"
+                  onClick={handleSignOut}
+                  className="text-foreground/60 hover:text-primary"
+                >
+                  Sign Out
+                </Button>
+              </div>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -80,14 +129,59 @@ const Navbar = () => {
                   {link.label}
                 </Link>
               ))}
-              <Link to="/signin" onClick={() => setMobileMenuOpen(false)}>
-                <Button variant="ghost" className="w-full">
-                  Sign In
-                </Button>
-              </Link>
-              <Link to="/signup" onClick={() => setMobileMenuOpen(false)}>
-                <Button className="w-full bg-gradient-primary">Sign Up</Button>
-              </Link>
+              
+              {!isAuthenticated ? (
+                <>
+                  <input 
+                    type="text" 
+                    placeholder="Search" 
+                    className="px-3 py-2 text-sm font-medium text-foreground border border-input rounded-md bg-background" 
+                  />
+                  <Link to="/role" state={{ mode: 'signin' }} onClick={() => setMobileMenuOpen(false)}>
+                    <Button variant="ghost" className="w-full">
+                      Sign In
+                    </Button>
+                  </Link>
+                  <Link to="/role" state={{ mode: 'signup' }} onClick={() => setMobileMenuOpen(false)}>
+                    <Button className="w-full bg-gradient-primary">
+                      Sign Up
+                    </Button>
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <input 
+                    type="text" 
+                    placeholder="Search" 
+                    className="px-3 py-2 text-sm font-medium text-foreground border border-input rounded-md bg-background" 
+                  />
+                  <Link to="/messages" onClick={() => setMobileMenuOpen(false)}>
+                    <Button variant="ghost" className="w-full justify-start">
+                      Messages
+                    </Button>
+                  </Link>
+                  <Link to="/profile" onClick={() => setMobileMenuOpen(false)}>
+                    <Button variant="ghost" className="w-full justify-start">
+                      Profile
+                    </Button>
+                  </Link>
+                  <Link 
+                    to={user?.role === 'client' ? "/dashboard/client" : "/dashboard/freelancer"} 
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <Button variant="ghost" className="w-full justify-start">
+                      Dashboard
+                    </Button>
+                  </Link>
+                  <Button
+                    variant="ghost"
+                    onClick={handleSignOut}
+                    className="w-full justify-start text-foreground/60 hover:text-primary"
+                  >
+                    Sign Out
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         )}

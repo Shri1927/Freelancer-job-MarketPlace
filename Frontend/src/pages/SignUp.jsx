@@ -1,460 +1,356 @@
-import { useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card } from "@/components/ui/card"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { Briefcase, User, Building2, ArrowLeft } from "lucide-react"
-import { toast } from "sonner"
+// SignUp.jsx
+import React, { useState } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Eye, EyeOff, User, Mail, Lock } from 'lucide-react';
+import { useAuthStore } from '../store/auth'
 
-const SignUp = () => {
-  const navigate = useNavigate()
-  const [step, setStep] = useState(1)
-  const [userType, setUserType] = useState("")
+export default function SignUp() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { signUp, signInWithGoogle, signInWithFacebook } = useAuthStore();
+
+  // Get role from state (from RoleSelector or from SignIn) or default to 'freelancer'
+  const role = location.state?.role || 'freelancer';
+
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    // Client fields
-    companyName: "",
-    industry: "",
-    companySize: "",
-    // Freelancer fields
-    skills: "",
-    hourlyRate: "",
-    experienceLevel: "",
-    portfolio: "",
-    location: ""
-  })
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    role: role
+  });
 
-  const handleNext = () => {
-    if (step === 1) {
-      if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
-        toast.error("Please fill in all fields")
-        return
-      }
-      if (formData.password !== formData.confirmPassword) {
-        toast.error("Passwords don't match")
-        return
-      }
-      setStep(2)
-    } else if (step === 2) {
-      if (!userType) {
-        toast.error("Please select your user type")
-        return
-      }
-      setStep(3)
-    }
-  }
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = e => {
-    e.preventDefault()
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+    setError('');
+  };
 
-    // Validate based on user type
-    if (userType === "client") {
-      if (!formData.companyName || !formData.industry || !formData.companySize) {
-        toast.error("Please fill in all required fields")
-        return
-      }
-    } else if (userType === "freelancer") {
-      if (!formData.skills || !formData.hourlyRate || !formData.experienceLevel) {
-        toast.error("Please fill in all required fields")
-        return
-      }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+
+    // Validation
+    if (!formData.name || !formData.email || !formData.password) {
+      setError('All fields are required');
+      return;
     }
 
-    // Save user info to localStorage
-    const userInfo = {
-      name: formData.name,
-      email: formData.email,
-      userType: userType,
-      ...(userType === "client"
-        ? {
-            companyName: formData.companyName,
-            industry: formData.industry,
-            companySize: formData.companySize
-          }
-        : {
-            skills: formData.skills,
-            hourlyRate: formData.hourlyRate,
-            experienceLevel: formData.experienceLevel,
-            location: formData.location,
-            portfolio: formData.portfolio
-          })
+    if (formData.password.length < 6) {
+      setError('Password must be at least 6 characters');
+      return;
     }
-    localStorage.setItem("userInfo", JSON.stringify(userInfo))
-    localStorage.setItem("isAuthenticated", "true")
 
-    toast.success("Account created successfully!")
-    navigate("/dashboard")
-  }
-
-  const renderStepContent = () => {
-    if (step === 1) {
-      return (
-        <div className="space-y-4">
-          <div>
-            <Label htmlFor="name">Full Name</Label>
-            <Input
-              id="name"
-              placeholder="John Smith"
-              value={formData.name}
-              onChange={e => setFormData({ ...formData, name: e.target.value })}
-              required
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="john@example.com"
-              value={formData.email}
-              onChange={e =>
-                setFormData({ ...formData, email: e.target.value })
-              }
-              required
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              value={formData.password}
-              onChange={e =>
-                setFormData({ ...formData, password: e.target.value })
-              }
-              required
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="confirmPassword">Confirm Password</Label>
-            <Input
-              id="confirmPassword"
-              type="password"
-              placeholder="••••••••"
-              value={formData.confirmPassword}
-              onChange={e =>
-                setFormData({ ...formData, confirmPassword: e.target.value })
-              }
-              required
-            />
-          </div>
-
-          <Button
-            type="button"
-            onClick={handleNext}
-            className="w-full bg-gradient-primary hover:opacity-90"
-          >
-            Continue
-          </Button>
-        </div>
-      )
-    } else if (step === 2) {
-      return (
-        <div className="space-y-6">
-          <div>
-            <Label className="text-base font-semibold mb-4 block">
-              I am a...
-            </Label>
-            <RadioGroup
-              value={userType}
-              onValueChange={setUserType}
-              className="grid grid-cols-2 gap-4"
-            >
-              <div>
-                <RadioGroupItem
-                  value="client"
-                  id="client"
-                  className="peer sr-only"
-                />
-                <Label
-                  htmlFor="client"
-                  className={`flex flex-col items-center justify-between rounded-md border-2 bg-popover p-4 hover:bg-accent hover:text-accent-foreground cursor-pointer transition-colors ${
-                    userType === "client"
-                      ? "border-primary bg-accent"
-                      : "border-muted"
-                  }`}
-                >
-                  <Building2 className="mb-3 h-6 w-6" />
-                  <span className="font-semibold">Client</span>
-                  <span className="text-xs text-muted-foreground text-center mt-1">
-                    Looking to hire freelancers
-                  </span>
-                </Label>
-              </div>
-              <div>
-                <RadioGroupItem
-                  value="freelancer"
-                  id="freelancer"
-                  className="peer sr-only"
-                />
-                <Label
-                  htmlFor="freelancer"
-                  className={`flex flex-col items-center justify-between rounded-md border-2 bg-popover p-4 hover:bg-accent hover:text-accent-foreground cursor-pointer transition-colors ${
-                    userType === "freelancer"
-                      ? "border-primary bg-accent"
-                      : "border-muted"
-                  }`}
-                >
-                  <User className="mb-3 h-6 w-6" />
-                  <span className="font-semibold">Freelancer</span>
-                  <span className="text-xs text-muted-foreground text-center mt-1">
-                    Looking for work opportunities
-                  </span>
-                </Label>
-              </div>
-            </RadioGroup>
-          </div>
-
-          <div className="flex gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setStep(1)}
-              className="flex-1"
-            >
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back
-            </Button>
-            <Button
-              type="button"
-              onClick={handleNext}
-              className="flex-1 bg-gradient-primary hover:opacity-90"
-              disabled={!userType}
-            >
-              Continue
-            </Button>
-          </div>
-        </div>
-      )
-    } else if (step === 3) {
-      return (
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {userType === "client" ? (
-            <>
-              <div>
-                <Label htmlFor="companyName">Company Name</Label>
-                <Input
-                  id="companyName"
-                  placeholder="Acme Inc."
-                  value={formData.companyName}
-                  onChange={e =>
-                    setFormData({ ...formData, companyName: e.target.value })
-                  }
-                  required
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="industry">Industry</Label>
-                <Select
-                  value={formData.industry}
-                  onValueChange={value =>
-                    setFormData({ ...formData, industry: value })
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select industry" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="technology">Technology</SelectItem>
-                    <SelectItem value="finance">Finance</SelectItem>
-                    <SelectItem value="healthcare">Healthcare</SelectItem>
-                    <SelectItem value="education">Education</SelectItem>
-                    <SelectItem value="retail">Retail</SelectItem>
-                    <SelectItem value="manufacturing">Manufacturing</SelectItem>
-                    <SelectItem value="consulting">Consulting</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label htmlFor="companySize">Company Size</Label>
-                <Select
-                  value={formData.companySize}
-                  onValueChange={value =>
-                    setFormData({ ...formData, companySize: value })
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select company size" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="1-10">1-10 employees</SelectItem>
-                    <SelectItem value="11-50">11-50 employees</SelectItem>
-                    <SelectItem value="51-200">51-200 employees</SelectItem>
-                    <SelectItem value="201-500">201-500 employees</SelectItem>
-                    <SelectItem value="500+">500+ employees</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </>
-          ) : (
-            <>
-              <div>
-                <Label htmlFor="skills">Skills (comma-separated)</Label>
-                <Input
-                  id="skills"
-                  placeholder="React, Node.js, TypeScript"
-                  value={formData.skills}
-                  onChange={e =>
-                    setFormData({ ...formData, skills: e.target.value })
-                  }
-                  required
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="hourlyRate">Hourly Rate ($)</Label>
-                <Input
-                  id="hourlyRate"
-                  type="number"
-                  placeholder="50"
-                  value={formData.hourlyRate}
-                  onChange={e =>
-                    setFormData({ ...formData, hourlyRate: e.target.value })
-                  }
-                  required
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="experienceLevel">Experience Level</Label>
-                <Select
-                  value={formData.experienceLevel}
-                  onValueChange={value =>
-                    setFormData({ ...formData, experienceLevel: value })
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select experience level" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="beginner">Beginner (0-2 years)</SelectItem>
-                    <SelectItem value="intermediate">Intermediate (2-5 years)</SelectItem>
-                    <SelectItem value="advanced">Advanced (5-10 years)</SelectItem>
-                    <SelectItem value="expert">Expert (10+ years)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label htmlFor="location">Location</Label>
-                <Input
-                  id="location"
-                  placeholder="City, Country"
-                  value={formData.location}
-                  onChange={e =>
-                    setFormData({ ...formData, location: e.target.value })
-                  }
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="portfolio">Portfolio URL (optional)</Label>
-                <Input
-                  id="portfolio"
-                  type="url"
-                  placeholder="https://yourportfolio.com"
-                  value={formData.portfolio}
-                  onChange={e =>
-                    setFormData({ ...formData, portfolio: e.target.value })
-                  }
-                />
-              </div>
-            </>
-          )}
-
-          <div className="flex gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setStep(2)}
-              className="flex-1"
-            >
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back
-            </Button>
-            <Button
-              type="submit"
-              className="flex-1 bg-gradient-primary hover:opacity-90"
-            >
-              Create Account
-            </Button>
-          </div>
-        </form>
-      )
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      return;
     }
-  }
+
+    setLoading(true);
+
+    try {
+      console.log('Starting signup process...');
+      console.log('Form data:', formData);
+
+      const result = await signUp(
+        formData.email,
+        formData.password,
+        formData.name,
+        formData.role
+      );
+
+      console.log('Signup result:', result);
+
+      if (result && result.success) {
+        console.log('Signup successful! Redirecting...');
+        // Redirect to questions page ONLY for freelancer role
+        if (formData.role === 'freelancer') {
+          navigate('/questions');
+        }
+        else if(formData.role === 'client') {
+          navigate('/clientaccount');
+        } else {
+          navigate('/');
+        }
+      } else {
+        const errorMessage = result?.error || 'Failed to create account. Please try again.';
+        setError(errorMessage);
+        console.error('Signup failed:', errorMessage);
+      }
+    } catch (err) {
+      console.error('Unexpected error during signup:', err);
+      setError('An unexpected error occurred. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setError('');
+    setLoading(true);
+    
+    try {
+      const result = await signInWithGoogle();
+      if (result && result.success) {
+        navigate('/');
+      } else {
+        setError(result?.error || 'Failed to sign in with Google');
+      }
+    } catch (err) {
+      setError('Failed to sign in with Google');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFacebookSignIn = async () => {
+    setError('');
+    setLoading(true);
+    
+    try {
+      const result = await signInWithFacebook();
+      if (result && result.success) {
+        navigate('/');
+      } else {
+        setError(result?.error || 'Failed to sign in with Facebook');
+      }
+    } catch (err) {
+      setError('Failed to sign in with Facebook');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Dynamic content based on role
+  const roleConfig = {
+    client: {
+      title: 'Create your client account',
+      subtitle: 'Join FreelanceHub and start hiring freelancers',
+      signinText: 'Sign in to your client account',
+      signinLink: '/signin'
+    },
+    freelancer: {
+      title: 'Create your freelancer account',
+      subtitle: 'Join FreelanceHub and start your freelancing journey',
+      signinText: 'Sign in to your account',
+      signinLink: '/signin'
+    }
+  };
+
+  const config = roleConfig[role] || roleConfig.freelancer;
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-hero p-4">
-      <Card className="w-full max-w-md p-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center px-4 py-12">
+      <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center gap-2 mb-4">
-            <div className="w-10 h-10 rounded-lg bg-gradient-primary flex items-center justify-center">
-              <Briefcase className="w-6 h-6 text-primary-foreground" />
-            </div>
-            <span className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-              FreelanceHub
-            </span>
-          </Link>
-          <h1 className="text-2xl font-bold mb-2">
-            {step === 1 && "Create Account"}
-            {step === 2 && "Choose Your Role"}
-            {step === 3 && userType === "client" ? "Client Information" : "Freelancer Information"}
-          </h1>
-          <p className="text-muted-foreground">
-            {step === 1 && "Join FreelanceHub today"}
-            {step === 2 && "Tell us about yourself"}
-            {step === 3 && "Complete your profile"}
-          </p>
-          {step > 1 && (
-            <div className="flex justify-center gap-2 mt-4">
-              {[1, 2, 3].map(s => (
-                <div
-                  key={s}
-                  className={`h-2 w-2 rounded-full ${
-                    s <= step ? "bg-primary" : "bg-muted"
-                  }`}
-                />
-              ))}
-            </div>
-          )}
+          <h1 className="text-3xl font-bold text-foreground mb-2">{config.title}</h1>
+          <p className="text-muted-foreground">{config.subtitle}</p>
         </div>
 
-        {renderStepContent()}
+        <div className="bg-card rounded-2xl shadow-medium p-8 border border-border">
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {error && (
+              <div className="bg-destructive/10 border border-destructive/20 text-destructive-foreground px-4 py-3 rounded-lg text-sm">
+                {error}
+              </div>
+            )}
 
-        {step === 1 && (
-          <p className="text-center text-sm text-muted-foreground mt-6">
-            Already have an account?{" "}
-            <Link
-              to="/signin"
-              className="text-primary hover:underline font-medium"
+            <div>
+              <label htmlFor="name" className="block text-sm font-medium text-foreground mb-2">
+                Full Name
+              </label>
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  className="w-full pl-11 pr-4 py-3 border border-input rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none bg-background"
+                  placeholder="Enter your full name"
+                  required
+                  disabled={loading}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
+                Email Address
+              </label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="w-full pl-11 pr-4 py-3 border border-input rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none bg-background"
+                  placeholder="Enter your email"
+                  required
+                  disabled={loading}
+                />
+              </div>
+            </div>
+
+            {/* Hidden role field */}
+            <input type="hidden" name="role" value={formData.role} />
+
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-foreground mb-2">
+                Password
+              </label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  id="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="w-full pl-11 pr-12 py-3 border border-input rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none bg-background"
+                  placeholder="Create a password (min. 6 characters)"
+                  required
+                  disabled={loading}
+                  minLength={6}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground disabled:opacity-50"
+                  disabled={loading}
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-foreground mb-2">
+                Confirm Password
+              </label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
+                <input
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  className="w-full pl-11 pr-12 py-3 border border-input rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none bg-background"
+                  placeholder="Confirm your password"
+                  required
+                  disabled={loading}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground disabled:opacity-50"
+                  disabled={loading}
+                >
+                  {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-primary hover:bg-primary-light text-primary-foreground font-medium py-3 rounded-lg transition-colors disabled:bg-primary-dark disabled:cursor-not-allowed flex items-center justify-center shadow-soft"
             >
-              Sign in
-            </Link>
-          </p>
-        )}
-      </Card>
-    </div>
-  )
-}
+              {loading ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Creating account...
+                </>
+              ) : (
+                'Create Account'
+              )}
+            </button>
+          </form>
 
-export default SignUp
+          <div className="mt-6">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-border"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-card text-muted-foreground">Or continue with</span>
+              </div>
+            </div>
+
+            <div className="mt-6 grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={handleGoogleSignIn}
+                disabled={loading}
+                className="flex items-center justify-center gap-3 px-4 py-3 border border-border rounded-lg hover:bg-secondary transition-colors disabled:opacity-50 disabled:cursor-not-allowed bg-background"
+              >
+                <svg className="w-5 h-5" viewBox="0 0 24 24">
+                  <path
+                    fill="#4285F4"
+                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                  />
+                  <path
+                    fill="#34A853"
+                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                  />
+                  <path
+                    fill="#FBBC05"
+                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                  />
+                  <path
+                    fill="#EA4335"
+                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                  />
+                </svg>
+                <span className="text-sm font-medium text-foreground">Google</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleFacebookSignIn}
+                disabled={loading}
+                className="flex items-center justify-center gap-3 px-4 py-3 border border-border rounded-lg hover:bg-secondary transition-colors disabled:opacity-50 disabled:cursor-not-allowed bg-background"
+              >
+                <svg className="w-5 h-5" fill="#1877F2" viewBox="0 0 24 24">
+                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                </svg>
+                <span className="text-sm font-medium text-foreground">Facebook</span>
+              </button>
+            </div>
+          </div>
+
+          <div className="mt-6 text-center">
+            <p className="text-sm text-muted-foreground">
+              Already have an account?{' '}
+              <Link 
+                to={config.signinLink} 
+                state={{ role }}
+                className="text-primary hover:text-primary-light font-medium"
+              >
+                {config.signinText}
+              </Link>
+            </p>
+          </div>
+        </div>
+
+        <p className="text-center text-xs text-muted-foreground mt-6">
+          By signing up, you agree to our Terms of Service and Privacy Policy
+        </p>
+      </div>
+    </div>
+  );
+}

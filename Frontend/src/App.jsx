@@ -17,6 +17,11 @@ import Messages from "./pages/Messages.jsx"
 import CreateContract from "./pages/CreateContract.jsx"
 import Workroom from "./pages/Workroom.jsx"
 import Feedback from "./pages/Feedback.jsx"
+import { useAuthStore } from '../src/store/auth.js'
+import OnboardingQuestionnaire from '../src/pages/create_profile/OnboardingQuestionnaire.jsx'
+import ProfileSetup from '../src/pages/create_profile/ProfileSetup.jsx'
+import RoleSelector from '../src/pages/create_profile/RoleSelector.jsx'
+import ClientProfile from "./pages/ClientProfile.jsx"
 
 
 const queryClient = new QueryClient()
@@ -43,6 +48,10 @@ const App = () => (
           <Route path="/profile" element={<Profile />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
+          <Route path="/questions" element={<OnboardingQuestionnaire />} />
+          <Route path="/create" element={<ProfileSetup />} />
+          <Route path="/role" element={<RoleSelector />} />
+          <Route path="/clientaccount" element={<ClientProfile />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
