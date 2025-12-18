@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import ClientDashboard from "./ClientDashboard"
-import FreelancerDashboard from "./FreelancerDashboard"
+import ClientDashboard from "./dashboard/client/ClientDashboard"
+import FreelancerDashboard from "./dashboard/freelancer/FreelancerDashboard"
+import DashboardTest from "./DashboardTest"
 
 const DashboardRouter = () => {
   const navigate = useNavigate()
@@ -11,6 +12,9 @@ const DashboardRouter = () => {
   useEffect(() => {
     const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}")
     const type = userInfo.userType
+
+    console.log('DashboardRouter: userInfo =', userInfo)
+    console.log('DashboardRouter: type =', type)
 
     if (!type) {
       // If no user type is set, redirect to sign in
@@ -39,7 +43,7 @@ const DashboardRouter = () => {
     return <FreelancerDashboard />
   }
 
-  return null
+  return <DashboardTest />
 }
 
 export default DashboardRouter

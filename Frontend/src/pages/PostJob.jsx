@@ -35,12 +35,12 @@ const PostJob = () => {
     <div className="min-h-screen">
       <Navbar />
       <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
+        <div className="mb-8 animate-fade-in-up">
           <h1 className="text-3xl font-bold">Post a Job</h1>
           <p className="text-muted-foreground">Describe the work and requirements</p>
         </div>
 
-        <Card className="p-6 max-w-3xl">
+        <Card className="p-6 max-w-3xl border-primary/20 animate-fade-in-up hover:shadow-large transition-all duration-300" style={{ animationDelay: '0.1s' }}>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <Label htmlFor="title">Title</Label>
@@ -82,19 +82,19 @@ const PostJob = () => {
               </div>
             </div>
             <div className="flex gap-3">
-              <Button type="submit" className="bg-gradient-primary">Post Job</Button>
+              <Button type="submit" className="bg-gradient-primary transition-all duration-300 hover:scale-105">Post Job</Button>
               <Link to="/jobs">
-                <Button type="button" variant="outline">Cancel</Button>
+                <Button type="button" variant="outline" className="transition-all duration-300 hover:scale-105">Cancel</Button>
               </Link>
             </div>
           </form>
         </Card>
 
-        <div className="max-w-3xl mt-6">
-          <Card className="p-4 flex items-center justify-between">
+        <div className="max-w-3xl mt-6 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+          <Card className="p-4 flex items-center justify-between border-primary/20 hover:shadow-medium transition-all duration-300">
             <p className="text-sm text-muted-foreground">After posting, invite freelancers or wait for proposals.</p>
             <Link to="/invitations">
-              <Button size="sm" variant="secondary">Invite Freelancers</Button>
+              <Button size="sm" variant="secondary" className="transition-all duration-300 hover:scale-105">Invite Freelancers</Button>
             </Link>
           </Card>
         </div>

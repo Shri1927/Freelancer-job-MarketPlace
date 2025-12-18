@@ -5,6 +5,23 @@ export const useAuthStore = create((set, get) => ({
   user: null,
   loading: false,
 
+  setUser: (user) => {
+    set({ user });
+    // Store user info in localStorage for persistence
+    if (user) {
+      localStorage.setItem('userInfo', JSON.stringify({
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        userType: user.role, // DashboardRouter looks for userType
+        avatar: user.avatar
+      }));
+    } else {
+      localStorage.removeItem('userInfo');
+    }
+  },
+
   signUp: async (email, password, name, role) => {
     try {
       console.log('Auth store: Signing up user', { email, name, role });
@@ -14,13 +31,22 @@ export const useAuthStore = create((set, get) => ({
       
       // Mock successful response
       const user = {
-        uid: 'user-' + Date.now(),
+        id: 'user-' + Date.now(),
         email,
-        displayName: name,
-        role
+        name,
+        role,
+        avatar: `https://ui-avatars.com/api/?name=${name}&background=0D8ABC&color=fff`
       };
       
       set({ user });
+      localStorage.setItem('userInfo', JSON.stringify({
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        userType: user.role,
+        avatar: user.avatar
+      }));
       
       return { success: true, user };
       
@@ -41,5 +67,10 @@ export const useAuthStore = create((set, get) => ({
   signInWithFacebook: async () => {
     // Implement Facebook sign-in
     return { success: false, error: 'Facebook sign-in not implemented' };
+  },
+
+  signOut: () => {
+    set({ user: null });
+    localStorage.removeItem('userInfo');
   }
 }));

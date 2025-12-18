@@ -69,16 +69,20 @@ export default function SignUp() {
       console.log('Signup result:', result);
 
       if (result && result.success) {
-        console.log('Signup successful! Redirecting...');
-        // Redirect to questions page ONLY for freelancer role
-        if (formData.role === 'freelancer') {
-          navigate('/questions');
-        }
-        else if(formData.role === 'client') {
-          navigate('/clientaccount');
-        } else {
-          navigate('/');
-        }
+        console.log('Signup successful! Storing user and redirecting...');
+        
+        // Store user data in localStorage
+        localStorage.setItem('userInfo', JSON.stringify({
+          id: result.user.id,
+          email: result.user.email,
+          name: result.user.name,
+          role: result.user.role,
+          userType: result.user.role,
+          avatar: result.user.avatar
+        }));
+
+        // Redirect to dashboard for both roles
+        navigate('/dashboard');
       } else {
         const errorMessage = result?.error || 'Failed to create account. Please try again.';
         setError(errorMessage);

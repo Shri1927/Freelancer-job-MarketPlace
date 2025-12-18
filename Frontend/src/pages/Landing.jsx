@@ -1,10 +1,9 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Search, Briefcase, Users, TrendingUp, CheckCircle, Star } from "lucide-react";
+import { Search, Briefcase, Users, TrendingUp, Star } from "lucide-react";
 
 const Landing = () => {
   const features = [
@@ -66,58 +65,93 @@ const Landing = () => {
   ];
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-white text-foreground">
       <Navbar />
       
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-hero py-16 md:py-24">
-        <div className="container mx-auto px-4">
-          <div className="grid lg:grid-cols-[1fr,520px] gap-10 items-center">
-            <div>
-              <p className="inline-block rounded-full bg-secondary px-4 py-1 text-sm font-medium text-foreground/80 mb-4">
+      <section className="relative isolate overflow-hidden px-4 py-24 bg-gradient-hero">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+          <div className="absolute -top-40 left-1/3 w-96 h-96 bg-primary/10 blur-3xl animate-pulse-slow" />
+          <div className="absolute bottom-0 right-0 w-[320px] h-[320px] bg-primary/5 blur-[140px] animate-pulse-slow" style={{ animationDelay: '1s' }} />
+        </div>
+        <div className="container mx-auto relative">
+          <div className="grid lg:grid-cols-[1.2fr,0.8fr] gap-16 items-center">
+            <div className="space-y-10 animate-fade-in-up">
+              <div className="inline-flex items-center gap-3 text-[10px] font-semibold tracking-[0.5em] uppercase text-foreground/60 animate-fade-in">
+                <span className="h-[1px] w-10 bg-primary/40" />
                 Stop doing everything. Get access to the top 1% with Business Plus.
-              </p>
-              <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-                Connecting clients in need to freelancers who
-                <span className="block bg-gradient-primary bg-clip-text text-transparent">deliver</span>
+              </div>
+              <h1 className="text-[clamp(2.8rem,6vw,4.8rem)] font-black leading-[1.05] tracking-tight animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+                <span className="text-foreground/80">Connecting clients in need</span>
+                <span className="block text-foreground/70">to freelancers who</span>
+                <span className="block text-transparent bg-gradient-primary bg-clip-text">deliver</span>
               </h1>
-              <div className="mt-6 bg-foreground/90 text-background rounded-2xl p-4 md:p-6 shadow-lg max-w-xl">
-                <div className="flex gap-2 text-sm mb-4">
-                  <button className="flex-1 rounded-full bg-background text-foreground px-4 py-2 font-medium">
-                    Find talent
-                  </button>
-                  <button className="flex-1 rounded-full/ bg-transparent text-background/80 px-4 py-2 font-medium opacity-80">
-                    Browse jobs
-                  </button>
-                </div>
-                <div className="flex gap-2 items-center">
-                  <Input placeholder="Search by role, skills, or keywords" className="bg-background text-foreground" />
-                  <Button className="bg-gradient-primary px-6">Search</Button>
-                </div>
-                <div className="mt-3 flex items-center gap-6 opacity-80 text-xs">
-                  <span>Microsoft</span>
-                  <span>airbnb</span>
-                  <span>Glassdoor</span>
+              <div className="grid gap-6 md:grid-cols-[minmax(0,0.9fr)] animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
+                <div className="bg-white border border-primary/20 rounded-[32px] p-6 md:p-8 backdrop-blur-lg space-y-6 shadow-medium hover:shadow-large transition-all duration-300 hover:scale-[1.02]">
+                  <div className="flex gap-2 text-xs uppercase tracking-widest text-foreground/70">
+                    <button className="flex-1 rounded-full bg-primary text-white py-3 font-semibold shadow-sm hover:bg-primary-dark transition-all duration-300 hover:scale-105">
+                      Find talent
+                    </button>
+                    <button className="flex-1 rounded-full border border-primary/30 text-foreground/70 py-3 font-semibold hover:text-primary hover:border-primary transition-all duration-300">
+                      Browse jobs
+                    </button>
+                  </div>
+                  <div className="flex gap-3 items-center">
+                    <Input
+                      placeholder="Search by role, skills, or keywords"
+                      className="bg-white border border-primary/20 text-foreground placeholder:text-foreground/40 focus:border-primary transition-all"
+                    />
+                    <Button className="bg-primary text-white px-6 font-semibold hover:bg-primary-dark transition-all duration-300 hover:scale-105">
+                      Search
+                    </Button>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-5 text-[10px] tracking-[0.4em] uppercase text-foreground/40">
+                    <span>Microsoft</span>
+                    <span>airbnb</span>
+                    <span>Glassdoor</span>
+                  </div>
                 </div>
               </div>
             </div>
-            <div className="hidden lg:block rounded-3xl overflow-hidden shadow-large">
-              <div className="aspect-[4/3] bg-gradient-primary/30" />
+            <div className="hidden lg:flex flex-col gap-6 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
+              <div className="bg-white border border-primary/20 rounded-[32px] p-8 backdrop-blur-xl shadow-medium space-y-6 hover:shadow-large transition-all duration-300 hover:scale-[1.02]">
+                <p className="text-xs uppercase tracking-[0.4em] text-foreground/60">Live metrics</p>
+                <div className="space-y-5">
+                  {stats.map((stat, index) => (
+                    <div key={index} className="flex items-center justify-between animate-fade-in-up" style={{ animationDelay: `${0.7 + index * 0.1}s` }}>
+                      <span className="text-foreground/50 text-sm">{stat.label}</span>
+                      <span className="text-3xl font-semibold text-primary">{stat.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="bg-white border border-primary/20 rounded-[32px] p-8 backdrop-blur-xl shadow-medium space-y-4 hover:shadow-large transition-all duration-300 hover:scale-[1.02]">
+                <p className="text-xs uppercase tracking-[0.4em] text-foreground/60">Why FreelanceHub</p>
+                {features.slice(0, 2).map((feature, index) => (
+                  <div key={index} className="flex items-center justify-between text-sm text-foreground/70 animate-fade-in-up" style={{ animationDelay: `${0.8 + index * 0.1}s` }}>
+                    <span>{feature.title}</span>
+                    <span className="h-px w-10 bg-primary/30" />
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Stats Section */}
-      <section className="py-12 bg-card border-y border-border">
+      <section className="py-16 border-t border-b border-primary/10 bg-gradient-to-b from-white to-secondary/30">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {stats.map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="text-3xl md:text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-2">
-                  {stat.value}
-                </div>
-                <div className="text-sm text-muted-foreground">{stat.label}</div>
+              <div
+                key={index}
+                className="flex flex-col gap-2 border border-primary/20 rounded-3xl px-6 py-8 bg-white hover:bg-primary/5 hover:border-primary/40 transition-all duration-300 hover:scale-105 animate-fade-in-up"
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                <span className="text-4xl md:text-5xl font-semibold tracking-tight text-primary">{stat.value}</span>
+                <span className="text-xs md:text-sm uppercase tracking-[0.3em] text-foreground/50">{stat.label}</span>
               </div>
             ))}
           </div>
@@ -125,64 +159,86 @@ const Landing = () => {
       </section>
 
       {/* Explore Categories */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">Explore millions of pros</h2>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+      <section className="py-24 bg-white">
+        <div className="container mx-auto px-4 space-y-10">
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 animate-fade-in-up">
+            <div>
+              <p className="text-xs tracking-[0.4em] uppercase text-foreground/50">Categories</p>
+              <h2 className="text-3xl md:text-5xl font-semibold text-foreground">Explore millions of pros</h2>
+            </div>
+            <p className="text-foreground/60 max-w-2xl">
+              Browse curated categories to find specialized freelancers who match your goals.
+            </p>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             {categories.map((cat, i) => (
-              <Card key={i} className="p-6 hover:shadow-medium transition-all">
-                <div className="w-12 h-12 rounded-xl border border-border flex items-center justify-center text-2xl mb-3 bg-secondary">
-                  {cat.icon}
-                </div>
-                <div className="font-medium">{cat.title}</div>
-              </Card>
+              <div
+                key={i}
+                className="group border border-primary/20 rounded-3xl px-6 py-8 flex flex-col gap-4 bg-white hover:bg-primary/5 hover:border-primary/40 transition-all duration-300 hover:scale-105 hover:-translate-y-1 animate-fade-in-up"
+                style={{ animationDelay: `${i * 0.05}s` }}
+              >
+                <div className="text-4xl transition-transform duration-300 group-hover:scale-110">{cat.icon}</div>
+                <div className="text-lg font-semibold text-foreground">{cat.title}</div>
+                <div className="h-px w-12 bg-primary/30 group-hover:w-20 transition-all duration-300" />
+              </div>
             ))}
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="py-20">
+      <section className="py-24 bg-gradient-to-b from-secondary/30 to-white">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Why Choose FreelanceHub?</h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Everything you need to succeed as a freelancer or find the perfect talent
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8 mb-12 animate-fade-in-up">
+            <div>
+              <p className="text-xs tracking-[0.4em] uppercase text-foreground/50">Why FreelanceHub?</p>
+              <h2 className="text-3xl md:text-5xl font-semibold text-foreground">Everything you need to succeed</h2>
+            </div>
+            <p className="text-foreground/60 max-w-2xl">
+              Everything you need to succeed as a freelancer or find the perfect talent.
             </p>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
             {features.map((feature, index) => (
-              <Card key={index} className="p-6 text-center hover:shadow-medium transition-all duration-300 hover:scale-105">
-                <div className="w-12 h-12 rounded-full bg-gradient-primary flex items-center justify-center mx-auto mb-4">
-                  <feature.icon className="w-6 h-6 text-primary-foreground" />
+              <div
+                key={index}
+                className="border border-primary/20 rounded-[32px] p-8 space-y-4 bg-white hover:bg-primary/5 hover:border-primary/40 transition-all duration-300 hover:-translate-y-2 hover:shadow-large animate-fade-in-up"
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                <div className="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center transition-transform duration-300 hover:scale-110 hover:rotate-6">
+                  <feature.icon className="w-6 h-6" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-                <p className="text-muted-foreground">{feature.description}</p>
-              </Card>
+                <h3 className="text-xl font-semibold text-foreground">{feature.title}</h3>
+                <p className="text-foreground/60">{feature.description}</p>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
       {/* How It Works */}
-      <section className="py-20 bg-secondary/30">
+      <section className="py-24 bg-white">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">How It Works</h2>
-            <p className="text-lg text-muted-foreground">Simple steps to get started</p>
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-16 animate-fade-in-up">
+            <div>
+              <p className="text-xs tracking-[0.4em] uppercase text-foreground/50">Process</p>
+              <h2 className="text-3xl md:text-5xl font-semibold text-foreground">How it works</h2>
+            </div>
+            <p className="text-foreground/60 max-w-2xl">Simple steps to get started.</p>
           </div>
-          <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-8">
             {[
               { step: "1", title: "Create Your Profile", desc: "Sign up and showcase your skills" },
               { step: "2", title: "Browse & Apply", desc: "Find projects that match your expertise" },
               { step: "3", title: "Get Hired & Earn", desc: "Work with clients and get paid securely" }
             ].map((item, index) => (
-              <div key={index} className="text-center">
-                <div className="w-16 h-16 rounded-full bg-gradient-primary text-primary-foreground flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
-                  {item.step}
-                </div>
-                <h3 className="text-xl font-semibold mb-2">{item.title}</h3>
-                <p className="text-muted-foreground">{item.desc}</p>
+              <div key={index} className="relative border border-primary/20 rounded-[32px] p-8 space-y-4 bg-white hover:bg-primary/5 hover:border-primary/40 transition-all duration-300 hover:scale-105 hover:-translate-y-1 animate-fade-in-up" style={{ animationDelay: `${index * 0.15}s` }}>
+                <div className="text-primary/50 text-sm uppercase tracking-[0.5em]">Step {item.step}</div>
+                <h3 className="text-2xl font-semibold text-foreground">{item.title}</h3>
+                <p className="text-foreground/60">{item.desc}</p>
+                {index < 2 && (
+                  <div className="hidden md:block absolute top-1/2 right-[-36px] w-16 h-px bg-primary/30" />
+                )}
               </div>
             ))}
           </div>
@@ -190,75 +246,94 @@ const Landing = () => {
       </section>
 
       {/* Testimonials */}
-      <section className="py-20">
+      <section className="py-24 bg-gradient-to-b from-white to-secondary/30">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">What Our Users Say</h2>
-            <p className="text-lg text-muted-foreground">Join thousands of satisfied freelancers</p>
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-14 animate-fade-in-up">
+            <div>
+              <p className="text-xs tracking-[0.4em] uppercase text-foreground/50">Testimonials</p>
+              <h2 className="text-3xl md:text-5xl font-semibold text-foreground">What our users say</h2>
+            </div>
+            <p className="text-foreground/60 max-w-2xl">Join thousands of satisfied freelancers.</p>
           </div>
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-6">
             {testimonials.map((testimonial, index) => (
-              <Card key={index} className="p-6">
-                <div className="flex gap-1 mb-4">
+              <div key={index} className="border border-primary/20 rounded-[32px] p-10 space-y-6 bg-white hover:bg-primary/5 hover:border-primary/40 transition-all duration-300 hover:scale-105 hover:-translate-y-1 animate-fade-in-up" style={{ animationDelay: `${index * 0.15}s` }}>
+                <div className="flex gap-1">
                   {[...Array(testimonial.rating)].map((_, i) => (
                     <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                   ))}
                 </div>
-                <p className="text-muted-foreground mb-4 italic">"{testimonial.content}"</p>
+                <p className="text-foreground/80 text-lg leading-relaxed italic">"{testimonial.content}"</p>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-primary flex items-center justify-center text-sm font-semibold text-primary-foreground">
+                  <div className="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center font-semibold">
                     {testimonial.name.charAt(0)}
                   </div>
                   <div>
-                    <p className="font-semibold">{testimonial.name}</p>
-                    <p className="text-sm text-muted-foreground">{testimonial.role}</p>
+                    <p className="font-semibold text-foreground">{testimonial.name}</p>
+                    <p className="text-foreground/60 text-sm">{testimonial.role}</p>
                   </div>
                 </div>
-              </Card>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
       {/* Pricing */}
-      <section className="py-20">
+      <section className="py-24 bg-white">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold mb-10 text-center">Clients only pay after hiring</h2>
+          <h2 className="text-3xl md:text-5xl font-semibold mb-14 text-center text-foreground animate-fade-in-up">
+            Clients only pay after hiring
+          </h2>
           <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
-            <Card className="p-8">
-              <h3 className="text-2xl font-semibold mb-1">Basic</h3>
-              <p className="text-sm text-muted-foreground mb-6">For starting out</p>
-              <p className="font-medium mb-6">5% Service fee after hiring</p>
-              <ul className="space-y-3 text-sm text-muted-foreground mb-8">
+            <div className="border border-primary/20 rounded-[32px] p-10 space-y-6 bg-white hover:bg-primary/5 hover:border-primary/40 transition-all duration-300 hover:scale-105 hover:-translate-y-1 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+              <div>
+                <h3 className="text-2xl font-semibold text-foreground">Basic</h3>
+                <p className="text-foreground/60 text-sm">For starting out</p>
+              </div>
+              <p className="text-xl font-medium text-primary">5% Service fee after hiring</p>
+              <ul className="space-y-3 text-foreground/60 text-sm">
                 <li>AI-powered features</li>
                 <li>Collaboration and project tracking tools</li>
                 <li>Pay as work is completed</li>
               </ul>
-              <Button variant="outline" className="w-full">Get started for free</Button>
-            </Card>
-            <Card className="p-8 border-2" style={{ borderColor: "hsl(var(--primary))" }}>
-              <div className="inline-flex items-center gap-2 rounded-full bg-secondary px-3 py-1 text-xs font-medium mb-4">POPULAR</div>
-              <h3 className="text-2xl font-semibold mb-1">Business Plus</h3>
-              <p className="text-sm text-muted-foreground mb-6">For growing</p>
-              <p className="font-medium mb-6">10% Service fee after hiring</p>
-              <ul className="space-y-3 text-sm text-muted-foreground mb-8">
+               <br /><br />  
+              <Button variant="outline" className="w-full border-primary/30 text-foreground hover:bg-primary hover:text-white transition-all duration-300">
+                Get started for free
+              </Button>
+            </div>
+            <div className="border-2 border-primary rounded-[32px] p-10 space-y-6 bg-primary text-white shadow-2xl hover:shadow-large transition-all duration-300 hover:scale-105 hover:-translate-y-1 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+              <div className="inline-flex items-center gap-2 text-xs tracking-[0.4em] uppercase">
+                <span className="h-[1px] w-6 bg-white" />
+                Popular
+              </div>
+              <div>
+                <h3 className="text-2xl font-semibold">Business Plus</h3>
+                <p className="text-white/80 text-sm">For growing</p>
+              </div>
+              <p className="text-xl font-medium">10% Service fee after hiring</p>
+              <ul className="space-y-3 text-white/90 text-sm">
                 <li>Instant access to pre-vetted top 1% of talent</li>
                 <li>Uma Recruiter</li>
                 <li>Teams controls</li>
               </ul>
-              <Button className="w-full bg-gradient-primary">Get started for free</Button>
-            </Card>
+              <Button className="w-full bg-white text-primary hover:bg-white/90 transition-all duration-300 hover:scale-105">Get started for free</Button>
+            </div>
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-primary text-primary-foreground">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to Get Started?</h2>
-          <p className="text-lg mb-8 opacity-90">Join FreelanceHub today and take your career to the next level</p>
-          <Link to="/signup">
-            <Button size="lg" variant="secondary" className="bg-background text-foreground hover:bg-background/90">
+      <section className="py-24 relative overflow-hidden bg-gradient-primary text-white">
+        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "radial-gradient(circle at 20% 20%, rgba(0,0,0,0.1), transparent 45%)" }} />
+        <div className="container mx-auto px-4 text-center relative space-y-6 animate-fade-in-up">
+          <p className="text-xs tracking-[0.4em] uppercase text-white/80">Ready?</p>
+          <h2 className="text-3xl md:text-5xl font-semibold">Ready to Get Started?</h2>
+          <p className="text-lg text-white/90">
+            Join FreelanceHub today and take your career to the next level
+          </p>
+          <Link to="/signup"> 
+            <Button size="lg" className="bg-white text-primary hover:bg-white/90 rounded-full px-10 transition-all duration-300 hover:scale-110 mt-2">
               Sign Up Now
             </Button>
           </Link>

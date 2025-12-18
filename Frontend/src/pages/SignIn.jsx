@@ -75,6 +75,16 @@ export default function SignIn() {
       const result = await mockSignIn(formData.email, formData.password);
 
       if (result.success) {
+        // Store user data in localStorage
+        localStorage.setItem('userInfo', JSON.stringify({
+          id: result.user.id,
+          email: result.user.email,
+          name: result.user.name,
+          role: result.user.role,
+          userType: result.user.role,
+          avatar: result.user.avatar
+        }));
+        
         // Update auth store with user data
         if (setUser) {
           setUser(result.user);
@@ -109,6 +119,16 @@ export default function SignIn() {
         avatar: 'https://ui-avatars.com/api/?name=Google+User&background=DB4437&color=fff'
       };
 
+      // Store user data in localStorage
+      localStorage.setItem('userInfo', JSON.stringify({
+        id: mockUser.id,
+        email: mockUser.email,
+        name: mockUser.name,
+        role: mockUser.role,
+        userType: mockUser.role,
+        avatar: mockUser.avatar
+      }));
+
       // Update auth store
       if (setUser) {
         setUser(mockUser);
@@ -139,6 +159,16 @@ export default function SignIn() {
         role: role,
         avatar: 'https://ui-avatars.com/api/?name=Facebook+User&background=4267B2&color=fff'
       };
+
+      // Store user data in localStorage
+      localStorage.setItem('userInfo', JSON.stringify({
+        id: mockUser.id,
+        email: mockUser.email,
+        name: mockUser.name,
+        role: mockUser.role,
+        userType: mockUser.role,
+        avatar: mockUser.avatar
+      }));
 
       // Update auth store
       if (setUser) {

@@ -6,10 +6,10 @@ import { Clock, DollarSign, FileText, Star, CheckCircle } from "lucide-react"
 const JobCard = ({ job }) => {
   return (
     <Link to={`/jobs/${job.id}`}>
-      <Card className="p-6 hover:shadow-medium transition-all duration-300 hover:scale-[1.02] cursor-pointer">
+      <Card className="p-6 hover:shadow-large transition-all duration-300 hover:scale-[1.02] cursor-pointer animate-fade-in-up border-primary/20 hover:border-primary/40 group">
         <div className="flex items-start justify-between mb-4">
           <div className="flex-1">
-            <h3 className="text-xl font-semibold mb-2 hover:text-primary transition-colors">
+            <h3 className="text-xl font-semibold mb-2 hover:text-primary transition-all duration-300 group-hover:translate-x-1">
               {job.title}
             </h3>
             <div className="flex items-center gap-3 text-sm text-muted-foreground mb-3">
@@ -44,7 +44,7 @@ const JobCard = ({ job }) => {
 
         <div className="flex items-center justify-between pt-4 border-t border-border">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-gradient-primary flex items-center justify-center text-xs font-semibold text-primary-foreground">
+            <div className="w-8 h-8 rounded-full bg-gradient-primary flex items-center justify-center text-xs font-semibold text-primary-foreground transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6">
               {job.client.name.charAt(0)}
             </div>
             <div>

@@ -21,8 +21,7 @@ import { useAuthStore } from '../src/store/auth.js'
 import OnboardingQuestionnaire from '../src/pages/create_profile/OnboardingQuestionnaire.jsx'
 import ProfileSetup from '../src/pages/create_profile/ProfileSetup.jsx'
 import RoleSelector from '../src/pages/create_profile/RoleSelector.jsx'
-import ClientProfile from "./pages/ClientProfile.jsx"
-
+import ClientProfile from './pages/ClientProfile.jsx'
 
 const queryClient = new QueryClient()
 

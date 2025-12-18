@@ -16,13 +16,13 @@ const BidCard = ({ bid, onAccept, onReject }) => {
   }
 
   return (
-    <Card className="p-6 hover:shadow-medium transition-all duration-300">
+    <Card className="p-6 hover:shadow-large transition-all duration-300 hover:scale-[1.02] animate-fade-in-up border-primary/20 hover:border-primary/40 group">
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-start gap-4">
           <img
             src={bid.freelancer.avatar}
             alt={bid.freelancer.name}
-            className="w-12 h-12 rounded-full"
+            className="w-12 h-12 rounded-full transition-transform duration-300 group-hover:scale-110 group-hover:ring-2 group-hover:ring-primary"
           />
           <div>
             <h3 className="font-semibold text-lg mb-1">

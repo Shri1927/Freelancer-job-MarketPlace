@@ -30,13 +30,13 @@ const Jobs = () => {
       <Navbar />
       
       <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
+        <div className="mb-8 animate-fade-in-up">
           <h1 className="text-4xl font-bold mb-2">Find Your Next Project</h1>
           <p className="text-muted-foreground">Browse through thousands of available jobs</p>
         </div>
 
         {/* Filters */}
-        <div className="bg-card p-6 rounded-lg shadow-soft mb-8">
+        <div className="bg-card p-6 rounded-lg shadow-soft mb-8 border-primary/20 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
           <div className="grid md:grid-cols-3 gap-4">
             <div className="relative md:col-span-3">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
@@ -96,8 +96,10 @@ const Jobs = () => {
 
         {/* Job Listings */}
         <div className="grid gap-6">
-          {filteredJobs.map((job) => (
-            <JobCard key={job.id} job={job} />
+          {filteredJobs.map((job, index) => (
+            <div key={job.id} className="animate-fade-in-up" style={{ animationDelay: `${0.2 + index * 0.05}s` }}>
+              <JobCard job={job} />
+            </div>
           ))}
         </div>
 
