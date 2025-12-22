@@ -17,6 +17,7 @@ import Messages from "./pages/Messages.jsx"
 import CreateContract from "./pages/CreateContract.jsx"
 import Workroom from "./pages/Workroom.jsx"
 import Feedback from "./pages/Feedback.jsx"
+import Contracts from "./pages/Contracts.jsx"
 import { useAuthStore } from '../src/store/auth.js'
 import OnboardingQuestionnaire from '../src/pages/create_profile/OnboardingQuestionnaire.jsx'
 import ProfileSetup from '../src/pages/create_profile/ProfileSetup.jsx'
@@ -43,6 +44,7 @@ const App = () => (
           <Route path="/contract" element={<CreateContract />} />
           <Route path="/workroom" element={<Workroom />} />
           <Route path="/feedback" element={<Feedback />} />
+          <Route path="/contracts" element={<Contracts />} />
           <Route path="/dashboard" element={<DashboardRouter />} />
           <Route path="/profile" element={<Profile />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

@@ -84,6 +84,13 @@ const BidCard = ({ bid, onAccept, onReject }) => {
               <CheckCircle className="w-4 h-4" />
               Accept
             </Button>
+            {/* Hire & Fund (demo) */}
+            <a
+              href={`/contract?jobId=${bid.jobId}&freelancerId=${bid.freelancer.id}&amount=${String(bid.amount).replace(/[^0-9.]/g,"")}`}
+              className="inline-block"
+            >
+              <Button size="sm" className="bg-gradient-primary">Hire & Fund</Button>
+            </a>
           </div>
         )}
       </div>
