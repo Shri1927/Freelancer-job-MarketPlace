@@ -1,160 +1,229 @@
-import { useState } from 'react'
-import { motion } from 'framer-motion'
-import { DollarSign, Wallet, CreditCard, Landmark, ArrowRight } from 'lucide-react'
+import { useState } from 'react';
+import { Wallet, DollarSign, CreditCard, History } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { WithdrawBalanceCard } from '@/components/withdraws/WithdrawBalanceCard';
+import { WithdrawForm } from '@/components/withdraws/WithdrawForm';
+import { PaymentMethodManager } from '@/components/withdraws/PaymentMethodManager';
+import { WithdrawalHistory } from '@/components/withdraws/WithdrawalHistory';
+import { toast } from 'sonner';
 
 const Withdraws = () => {
-  const [withdrawAmount, setWithdrawAmount] = useState('')
-  const [selectedMethod, setSelectedMethod] = useState('bank')
+  // Mock data - Replace with actual API calls
+  const [availableBalance] = useState(8200);
+  const [pendingClearance] = useState(4200);
+  const [inProgress] = useState(3500);
+  const [paymentMethods, setPaymentMethods] = useState([
+    {
+      id: 'method-1',
+      type: 'bank',
+      accountName: 'John Doe',
+      accountNumber: '1234567890',
+      routingNumber: '987654321',
+      bankName: 'Chase Bank',
+      isPrimary: true,
+      isVerified: true,
+      createdAt: '2024-01-15T10:00:00Z',
+    },
+    {
+      id: 'method-2',
+      type: 'paypal',
+      email: 'john.doe@example.com',
+      isPrimary: false,
+      isVerified: true,
+      createdAt: '2024-01-20T10:00:00Z',
+    },
+  ]);
+  const [withdrawals, setWithdrawals] = useState([
+    {
+      id: 'wd-1',
+      amount: 2000,
+      fee: 0,
+      totalAmount: 2000,
+      method: 'bank',
+      methodName: 'Bank Transfer',
+      status: 'completed',
+      createdAt: '2024-02-01T10:00:00Z',
+      completedAt: '2024-02-04T10:00:00Z',
+    },
+    {
+      id: 'wd-2',
+      amount: 1500,
+      fee: 1.5,
+      totalAmount: 1498.5,
+      method: 'paypal',
+      methodName: 'PayPal',
+      status: 'completed',
+      createdAt: '2024-01-28T10:00:00Z',
+      completedAt: '2024-01-28T10:30:00Z',
+    },
+    {
+      id: 'wd-3',
+      amount: 3000,
+      fee: 0,
+      totalAmount: 3000,
+      method: 'bank',
+      methodName: 'Bank Transfer',
+      status: 'processing',
+      createdAt: '2024-01-25T10:00:00Z',
+    },
+    {
+      id: 'wd-4',
+      amount: 800,
+      fee: 12,
+      totalAmount: 788,
+      method: 'wallet',
+      methodName: 'Digital Wallet',
+      status: 'completed',
+      createdAt: '2024-01-20T10:00:00Z',
+      completedAt: '2024-01-22T10:00:00Z',
+    },
+    {
+      id: 'wd-5',
+      amount: 1200,
+      fee: 1.5,
+      totalAmount: 1198.5,
+      method: 'paypal',
+      methodName: 'PayPal',
+      status: 'pending',
+      createdAt: '2024-02-10T10:00:00Z',
+    },
+  ]);
 
-  const withdrawMethods = [
-    { id: 'bank', name: 'Bank Transfer', icon: Landmark, fee: '2%', time: '3-5 business days' },
-    { id: 'paypal', name: 'PayPal', icon: CreditCard, fee: '3%', time: 'Instant' },
-    { id: 'wallet', name: 'Digital Wallet', icon: Wallet, fee: '1.5%', time: '1-2 business days' },
-  ]
+  // Handler for adding payment method
+  const handleAddPaymentMethod = (methodData) => {
+    setPaymentMethods([...paymentMethods, methodData]);
+  };
 
-  const recentWithdraws = [
-    { id: 1, amount: 2000, method: 'Bank Transfer', date: '2024-02-01', status: 'completed' },
-    { id: 2, amount: 1500, method: 'PayPal', date: '2024-01-28', status: 'completed' },
-    { id: 3, amount: 3000, method: 'Bank Transfer', date: '2024-01-25', status: 'pending' },
-    { id: 4, amount: 800, method: 'Digital Wallet', date: '2024-01-20', status: 'completed' },
-  ]
+  // Handler for updating payment method
+  const handleUpdatePaymentMethod = (updatedMethod) => {
+    setPaymentMethods(
+      paymentMethods.map((method) =>
+        method.id === updatedMethod.id ? updatedMethod : method
+      )
+    );
+  };
 
-  const availableBalance = 8200
+  // Handler for deleting payment method
+  const handleDeletePaymentMethod = (methodId) => {
+    setPaymentMethods(paymentMethods.filter((method) => method.id !== methodId));
+  };
 
-  const handleWithdraw = (e) => {
-    e.preventDefault()
-    if (withdrawAmount && parseFloat(withdrawAmount) > 0 && parseFloat(withdrawAmount) <= availableBalance) {
-      // Add withdraw logic here
-      console.log('Withdrawing:', withdrawAmount, 'via', selectedMethod)
-      setWithdrawAmount('')
-    }
-  }
+  // Handler for setting primary payment method
+  const handleSetPrimaryPaymentMethod = (methodId) => {
+    setPaymentMethods(
+      paymentMethods.map((method) => ({
+        ...method,
+        isPrimary: method.id === methodId,
+      }))
+    );
+  };
+
+  // Handler for creating withdrawal
+  const handleWithdraw = (withdrawalData) => {
+    const newWithdrawal = {
+      ...withdrawalData,
+      id: `wd-${Date.now()}`,
+      status: 'pending',
+      createdAt: new Date().toISOString(),
+    };
+    setWithdrawals([newWithdrawal, ...withdrawals]);
+    
+    // Update available balance (in real app, this would come from backend)
+    // setAvailableBalance(availableBalance - withdrawalData.amount);
+  };
+
+  // Handler for cancelling withdrawal
+  const handleCancelWithdrawal = (withdrawalId) => {
+    setWithdrawals(
+      withdrawals.map((wd) =>
+        wd.id === withdrawalId
+          ? { ...wd, status: 'cancelled', cancelledAt: new Date().toISOString() }
+          : wd
+      )
+    );
+  };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="space-y-6 p-6"
-    >
-      <div>
-        <h1 className="text-3xl font-bold text-gray/90 mb-2">Withdraws</h1>
-        <p className="text-gray/80">Withdraw your earnings to your preferred method</p>
-      </div>
-
-      {/* Balance Card */}
-      <div className="bg-gradient-to-r from-primary/80 to-primary/90 rounded-xl shadow-lg p-6 text-white">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-primary-100 mb-2">Available Balance</p>
-            <p className="text-4xl font-bold">${availableBalance.toLocaleString()}</p>
-          </div>
-          <Wallet className="w-16 h-16 text-primary/30" />
+    <div className=" bg-gray-50 ">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10">
+        {/* Header */}
+        <div className="mb-6 md:mb-8">
+          <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
+            Withdraw Funds
+          </h1>
+          <p className="text-sm md:text-base text-muted-foreground">
+            Manage your withdrawals and payment methods
+          </p>
         </div>
-      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Withdraw Form */}
-        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray/30">
-          <h2 className="text-xl font-bold text-gray/90 mb-4">Withdraw Funds</h2>
-          <form onSubmit={handleWithdraw} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray/80 mb-2">Amount</label>
-              <div className="relative">
-                <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray/40 w-5 h-5" />
-                <input
-                  type="number"
-                  value={withdrawAmount}
-                  onChange={(e) => setWithdrawAmount(e.target.value)}
-                  placeholder="Enter amount"
-                  min="1"
-                  max={availableBalance}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/60"
-                  required
+        {/* Balance Card */}
+        <div className="mb-6 md:mb-8">
+          <WithdrawBalanceCard
+            availableBalance={availableBalance}
+            pendingClearance={pendingClearance}
+            inProgress={inProgress}
+          />
+        </div>
+
+        {/* Tabs */}
+        <Tabs defaultValue="withdraw" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-3 lg:w-auto lg:inline-flex">
+            <TabsTrigger value="withdraw" className="gap-2">
+              <DollarSign className="w-4 h-4" />
+              Withdraw
+            </TabsTrigger>
+            <TabsTrigger value="methods" className="gap-2">
+              <CreditCard className="w-4 h-4" />
+              Payment Methods
+            </TabsTrigger>
+            <TabsTrigger value="history" className="gap-2">
+              <History className="w-4 h-4" />
+              History
+            </TabsTrigger>
+          </TabsList>
+
+          {/* Withdraw Tab */}
+          <TabsContent value="withdraw" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <WithdrawForm
+                availableBalance={availableBalance}
+                paymentMethods={paymentMethods}
+                onWithdraw={handleWithdraw}
+              />
+              <div className="lg:order-first">
+                <WithdrawalHistory
+                  withdrawals={withdrawals.slice(0, 5)}
+                  onCancel={handleCancelWithdrawal}
                 />
               </div>
-              <p className="text-xs text-gray/60 mt-1">Max: ${availableBalance.toLocaleString()}</p>
             </div>
+          </TabsContent>
 
-            <div>
-              <label className="block text-sm font-medium text-gray/70 mb-2">Withdrawal Method</label>
-              <div className="space-y-2">
-                {withdrawMethods.map((method) => {
-                  const Icon = method.icon
-                  return (
-                    <button
-                      key={method.id}
-                      type="button"
-                      onClick={() => setSelectedMethod(method.id)}
-                      className={`w-full p-4 border-2 rounded-lg transition-all ${
-                        selectedMethod === method.id
-                          ? 'border-primary/70 bg-primary/10'
-                          : 'border-gray/40 hover:border-gray/50'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <Icon className={`w-6 h-6 ${
-                            selectedMethod === method.id ? 'text-primary/70' : 'text-gray/60'
-                          }`} />
-                          <div className="text-left">
-                            <p className="font-semibold text-gray/90">{method.name}</p>
-                            <p className="text-xs text-gray/70">Fee: {method.fee} • {method.time}</p>
-                          </div>
-                        </div>
-                        {selectedMethod === method.id && (
-                          <div className="w-5 h-5 bg-primary/80 rounded-full flex items-center justify-center">
-                            <div className="w-2 h-2 bg-white rounded-full" />
-                          </div>
-                        )}
-                      </div>
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
+          {/* Payment Methods Tab */}
+          <TabsContent value="methods" className="space-y-6">
+            <PaymentMethodManager
+              paymentMethods={paymentMethods}
+              onAdd={handleAddPaymentMethod}
+              onUpdate={handleUpdatePaymentMethod}
+              onDelete={handleDeletePaymentMethod}
+              onSetPrimary={handleSetPrimaryPaymentMethod}
+            />
+          </TabsContent>
 
-            <button
-              type="submit"
-              className="w-full bg-primary/80 hover:bg-primary/90 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
-            >
-              <span>Withdraw Now</span>
-              <ArrowRight className="w-5 h-5" />
-            </button>
-          </form>
-        </div>
-
-        {/* Recent Withdraws */}
-        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray/40">
-          <h2 className="text-xl font-bold text-gray/90 mb-4">Recent Withdraws</h2>
-          <div className="space-y-3">
-            {recentWithdraws.map((withdraw) => (
-              <div
-                key={withdraw.id}
-                className="flex items-center justify-between p-4 rounded-lg border border-gray/30 hover:bg-gray/20 transition-colors"
-              >
-                <div>
-                  <p className="font-semibold text-gray/90">{withdraw.method}</p>
-                  <p className="text-sm text-gray/60">{new Date(withdraw.date).toLocaleDateString()}</p>
-                </div>
-                <div className="text-right">
-                  <p className="font-bold text-gray/90">${withdraw.amount.toLocaleString()}</p>
-                  <span className={`text-xs font-semibold ${
-                    withdraw.status === 'completed' ? 'text-green/70' : 'text-yellow/70'
-                  }`}>
-                    {withdraw.status}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+          {/* History Tab */}
+          <TabsContent value="history" className="space-y-6">
+            <WithdrawalHistory
+              withdrawals={withdrawals}
+              onCancel={handleCancelWithdrawal}
+            />
+          </TabsContent>
+        </Tabs>
       </div>
-    </motion.div>
-  )
-}
+    </div>
+  );
+};
 
-export default Withdraws
+export default Withdraws;
 
 
 

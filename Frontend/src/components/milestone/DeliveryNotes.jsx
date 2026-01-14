@@ -53,7 +53,7 @@ const DeliveryNotes = ({
       <div
         className={cn(
           'rounded-lg border transition-all',
-          isFocused ? 'border-primaryblue ring-2 ring-primaryblue/20' : 'border-border'
+          isFocused ? 'border-primary ring-2 ring-primary/20' : 'border-border'
         )}
       >
         {/* Formatting Toolbar */}

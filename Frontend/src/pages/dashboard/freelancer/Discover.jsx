@@ -46,13 +46,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 const Discover = () => {
   const navigate = useNavigate()
-  
+
   // Sample job data - matches dashboard style
   const [jobs, setJobs] = useState([])
   const [filteredJobs, setFilteredJobs] = useState([])
   const [savedJobs, setSavedJobs] = useState(new Set())
   const [loading, setLoading] = useState(false)
-  
+
   // Filter states
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedTab, setSelectedTab] = useState('recommended')
@@ -64,7 +64,6 @@ const Discover = () => {
     jobType: '',
     remote: true,
     skills: [],
-    sortBy: 'match'
   })
 
   // Load jobs on mount
@@ -76,7 +75,7 @@ const Discover = () => {
     setLoading(true)
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1000))
-    
+
     const sampleJobs = [
       {
         id: 1,
@@ -92,9 +91,6 @@ const Discover = () => {
         proposals: 8,
         proposalsMax: 25,
         views: 127,
-        matchScore: 92,
-        isFeatured: true,
-        isQuickApply: true
       },
       {
         id: 2,
@@ -110,9 +106,6 @@ const Discover = () => {
         proposals: 12,
         proposalsMax: 30,
         views: 89,
-        matchScore: 87,
-        isFeatured: false,
-        isQuickApply: true
       },
       {
         id: 3,
@@ -128,9 +121,6 @@ const Discover = () => {
         proposals: 15,
         proposalsMax: 20,
         views: 203,
-        matchScore: 78,
-        isFeatured: true,
-        isQuickApply: false
       },
       {
         id: 4,
@@ -146,12 +136,9 @@ const Discover = () => {
         proposals: 5,
         proposalsMax: 15,
         views: 56,
-        matchScore: 95,
-        isFeatured: false,
-        isQuickApply: true
       }
     ]
-    
+
     setJobs(sampleJobs)
     setFilteredJobs(sampleJobs)
     setLoading(false)
@@ -162,26 +149,20 @@ const Discover = () => {
     let filtered = jobs.filter(job => {
       // Search filter
       const matchesSearch = job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           job.skills.some(skill => skill.toLowerCase().includes(searchTerm.toLowerCase()))
-      
+        job.skills.some(skill => skill.toLowerCase().includes(searchTerm.toLowerCase()))
+
       // Budget filter
       const matchesBudget = job.budget.min >= filters.budgetMin && job.budget.max <= filters.budgetMax
-      
+
       // Tab filter
-      const matchesTab = selectedTab === 'recommended' || 
-                        (selectedTab === 'saved' && savedJobs.has(job.id)) ||
-                        selectedTab === 'all'
-      
+      const matchesTab = selectedTab === 'recommended' ||
+        (selectedTab === 'saved' && savedJobs.has(job.id)) ||
+        selectedTab === 'all'
+
       return matchesSearch && matchesBudget && matchesTab
     })
 
-    // Sort jobs
-    filtered.sort((a, b) => {
-      if (filters.sortBy === 'match') return b.matchScore - a.matchScore
-      if (filters.sortBy === 'budget') return (b.budget.min + b.budget.max) - (a.budget.min + a.budget.max)
-      if (filters.sortBy === 'newest') return 0 // Already sorted
-      return 0
-    })
+
 
     setFilteredJobs(filtered)
   }, [searchTerm, filters, selectedTab, savedJobs, jobs])
@@ -207,37 +188,25 @@ const Discover = () => {
         {/* Job Header */}
         <div className="flex items-start justify-between mb-4">
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-2">
-              {job.isFeatured && (
-                <Badge className="bg-gradient-to-r from-primary to-primary/80 text-xs">
-                  <Zap className="w-3 h-3 mr-1" />
-                  Featured
-                </Badge>
-              )}
-              {job.isQuickApply && (
-                <Badge variant="outline" className="text-xs border-green-200 text-green-700">
-                  Quick Apply
-                </Badge>
-              )}
-            </div>
-            <Link 
+
+            <Link
               to={`/discover/jobss/${job.id}`}
-              className="block mb-2 hover:text-primary transition-colors line-clamp-2 font-semibold text-lg leading-tight group-hover:underline"
+              className="block mb-2 hover:text-primary transition-colors line-clamp-2 font-semibold text-sm leading-tight group-hover:underline"
             >
               {job.title}
             </Link>
-            <div className="flex items-center gap-4 text-xs text-muted-foreground mb-4">
+            <div className="flex items-center gap-4 text-sm text-muted-foreground mt-4">
               <div className="flex items-center gap-1">
                 <Star className="w-3 h-3 text-orange-500 fill-orange-500" />
                 <span>{job.client.rating}</span>
               </div>
               <div className="flex items-center gap-1">
                 <Users className="w-3 h-3" />
-                <span>{job.proposals}/{job.proposalsMax} proposals</span>
+                <span>{job.proposals}</span>
               </div>
               <div className="flex items-center gap-1">
                 <Eye className="w-3 h-3" />
-                <span>{job.views} views</span>
+                <span>{job.views} </span>
               </div>
             </div>
           </div>
@@ -251,8 +220,8 @@ const Discover = () => {
               toggleSaveJob(job.id)
             }}
           >
-            <Heart 
-              className={`w-5 h-5 transition-all ${savedJobs.has(job.id) ? 'fill-primary text-primary' : ''}`} 
+            <Heart
+              className={`w-5 h-5 transition-all ${savedJobs.has(job.id) ? 'fill-primary text-primary' : ''}`}
             />
           </Button>
         </div>
@@ -260,28 +229,17 @@ const Discover = () => {
         {/* Job Details */}
         <div className="space-y-3 mb-6">
           <div className="flex items-center justify-between">
-            <span className="text-2xl font-bold text-primary">
+            <span className="text-sm font-bold text-black">
               ${job.budget.min.toLocaleString()}-{job.budget.max.toLocaleString()}
             </span>
             <Badge variant="secondary" className="text-xs">
               {job.budget.type}
             </Badge>
           </div>
-          
-          <div className="flex flex-wrap gap-1">
-            {job.skills.slice(0, 4).map((skill, index) => (
-              <Badge key={index} variant="outline" className="text-xs">
-                {skill}
-              </Badge>
-            ))}
-            {job.skills.length > 4 && (
-              <Badge variant="outline" className="text-xs">
-                +{job.skills.length - 4} more
-              </Badge>
-            )}
-          </div>
 
-          <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
+
+
+          <p className="text-[12px] text-muted-foreground line-clamp-3 leading-relaxed">
             {job.description}
           </p>
 
@@ -296,34 +254,29 @@ const Discover = () => {
             </div>
             <span>{job.posted}</span>
           </div>
+          <div className="flex flex-wrap gap-1">
+            {job.skills.slice(0, 4).map((skill, index) => (
+              <Badge key={index} variant="outline" className="text-[10px]">
+                {skill}
+              </Badge>
+            ))}
+            {job.skills.length > 4 && (
+              <Badge variant="outline" className="text-xs">
+                +{job.skills.length - 4} more
+              </Badge>
+            )}
+          </div>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-2 pt-4 border-t border-primary/10">
-          <Button 
-            className="flex-1 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90"
-            onClick={() => quickApply(job)}
-          >
-            {job.isQuickApply ? 'Quick Apply' : 'Submit Proposal'}
-          </Button>
-          <Button variant="outline" className="flex-1" asChild>
+        <div className="flex flex-col sm:flex-row gap-2  ">
+
+          <Button variant="outline" className="flex-1 bg-primary text-white" asChild>
             <Link to={`/discover/jobss/${job.id}`}>View Details</Link>
           </Button>
         </div>
 
-        {/* Match Score */}
-        <div className="mt-4 pt-4 border-t border-primary/10">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-muted-foreground">Skills Match</span>
-            <div className="w-20 bg-primary/10 rounded-full h-2">
-              <div 
-                className="bg-gradient-to-r from-primary to-primary/80 h-2 rounded-full transition-all"
-                style={{ width: `${job.matchScore}%` }}
-              />
-            </div>
-            <span className="text-sm font-semibold text-primary">{job.matchScore}%</span>
-          </div>
-        </div>
+
       </div>
     </Card>
   )
@@ -345,28 +298,11 @@ const Discover = () => {
                 </span>
               </p>
             </div>
-            <div className="flex items-center gap-2">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="gap-2">
-                    <TrendingUp className="w-4 h-4" />
-                    Boost Profile
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuLabel>Complete your profile to get priority</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>Add Portfolio (2/5)</DropdownMenuItem>
-                  <DropdownMenuItem>Verify Skills</DropdownMenuItem>
-                  <DropdownMenuItem>Complete Certifications</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
           </div>
 
           {/* Search & Tabs */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
-            <div className="lg:col-span-2">
+            <div className="lg:col-span-4">
               <div className="relative">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <Input
@@ -377,36 +313,14 @@ const Discover = () => {
                 />
               </div>
             </div>
-            <Button variant="outline" className="h-12 justify-start gap-2 lg:justify-center">
-              <Filter className="w-5 h-5" />
-              <span className="hidden sm:inline">Filters</span>
-              <ChevronDown className="w-4 h-4 ml-auto" />
-            </Button>
           </div>
 
           {/* Stats Row */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <div className="text-center p-4 bg-white backdrop-blur rounded-xl border">
-              <div className="text-2xl font-bold text-primary mb-1">{filteredJobs.length}</div>
-              <div className="text-sm text-muted-foreground">New matches today</div>
-            </div>
-            <div className="text-center p-4 bg-white backdrop-blur rounded-xl border">
-              <div className="text-2xl font-bold text-green-600 mb-1">23%</div>
-              <div className="text-sm text-muted-foreground">Win rate</div>
-            </div>
-            <div className="text-center p-4 bg-white backdrop-blur rounded-xl border">
-              <div className="text-2xl font-bold text-blue-600 mb-1">2h 15m</div>
-              <div className="text-sm text-muted-foreground">Avg response</div>
-            </div>
-            <div className="text-center p-4 bg-white backdrop-blur rounded-xl border">
-              <div className="text-2xl font-bold text-orange-600 mb-1">$2,800</div>
-              <div className="text-sm text-muted-foreground">Avg project</div>
-            </div>
-          </div>
+      
         </div>
 
         {/* Main Content - Tabs + Filters + Jobs */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
           {/* Filters Sidebar */}
           <Card className="lg:col-span-1 h-fit sticky top-24 self-start p-6 border-primary/20">
             <h3 className="font-semibold mb-6 flex items-center gap-2 text-lg">
@@ -430,7 +344,7 @@ const Discover = () => {
             </div>
 
             {/* Quick Filters */}
-            <div className="space-y-4 mb-6">
+            <div className="space-y-1 mb-6">
               <div>
                 <label className="text-sm font-medium mb-3 block">Job Type</label>
                 <div className="space-y-2">
@@ -460,22 +374,9 @@ const Discover = () => {
               </div>
             </div>
 
-            {/* Sort */}
-            <div>
-              <label className="text-sm font-medium mb-2 block">Sort By</label>
-              <Select value={filters.sortBy} onValueChange={(val) => setFilters(prev => ({ ...prev, sortBy: val }))}>
-                <SelectTrigger className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="match">Best Match</SelectItem>
-                  <SelectItem value="budget">Highest Budget</SelectItem>
-                  <SelectItem value="newest">Newest</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
 
-            <Button className="w-full mt-6 bg-gradient-to-r from-primary to-primary/80">Clear Filters</Button>
+
+            <Button className="w-full  bg-gradient-to-r from-primary to-primary/80">Clear Filters</Button>
           </Card>
 
           {/* Jobs Content */}

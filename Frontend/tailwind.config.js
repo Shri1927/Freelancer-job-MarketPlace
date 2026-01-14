@@ -37,6 +37,7 @@ export default {
          DEFAULT: "hsl(var(--primaryblue))",
           foreground: "hsl(var(--primaryblue-foreground))",
           light: "hsl(var(--primaryblue-light))",
+            dark: "hsl(var(--primaryblue-dark))",
 
         },
         secondary: {
@@ -52,6 +53,11 @@ export default {
           DEFAULT: "hsl(var(--warning))",
           foreground: "hsl(var(--warning-foreground))",
           light: "hsl(var(--warning-light))",
+        },
+         pending: {
+          DEFAULT: "hsl(var(--pending))",
+          foreground: "hsl(var(--pending-foreground))",
+          light: "hsl(var(--pending-light))",
         },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",

@@ -27,7 +27,7 @@ import { toast } from 'sonner';
 
 const STATUS_CONFIG = {
   draft: { label: 'Draft', icon: <Clock className="h-4 w-4" />, color: 'bg-muted text-muted-foreground' },
-  submitted: { label: 'Submitted', icon: <Send className="h-4 w-4" />, color: 'bg-primaryblue text-primaryblue-foreground' },
+  submitted: { label: 'Submitted', icon: <Send className="h-4 w-4" />, color: 'bg-primary text-primary-foreground' },
   revision_requested: { label: 'Revision Requested', icon: <RotateCcw className="h-4 w-4" />, color: 'bg-warning text-warning-foreground' },
   approved: { label: 'Approved', icon: <CheckCircle2 className="h-4 w-4" />, color: 'bg-success text-success-foreground' },
 };
@@ -146,7 +146,7 @@ const DeliveryPanel = ({
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-lg">
-            <Package className="h-5 w-5 text-primaryblue" />
+            <Package className="h-5 w-5 text-primary" />
             Delivery & Submission
           </CardTitle>
           <Badge className={cn('gap-1.5', statusConfig.color)}>
@@ -177,9 +177,9 @@ const DeliveryPanel = ({
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <button 
             onClick={() => setActiveDeliveryTab('uploaded')}
-            className="p-3 bg-primaryblue/5 rounded-lg border border-primaryblue/20 hover:bg-primaryblue/10 transition-colors text-left"
+            className="p-3 bg-primary/5 rounded-lg border border-primary/20 hover:bg-primary/10 transition-colors text-left"
           >
-            <div className="flex items-center gap-2 text-primaryblue mb-1">
+            <div className="flex items-center gap-2 text-primary mb-1">
               <FileCheck className="h-4 w-4" />
               <span className="text-xs font-medium">Files</span>
             </div>
@@ -227,7 +227,7 @@ const DeliveryPanel = ({
               <FolderOpen className="h-4 w-4" />
               <span className="hidden sm:inline">Files</span>
               {totalFiles > 0 && (
-                <span className="ml-1 text-xs bg-primaryblue/20 px-1.5 py-0.5 rounded">
+                <span className="ml-1 text-xs bg-primary/20 px-1.5 py-0.5 rounded">
                   {totalFiles}
                 </span>
               )}
@@ -240,7 +240,7 @@ const DeliveryPanel = ({
               <Link2 className="h-4 w-4" />
               <span className="hidden sm:inline">Links</span>
               {totalLinks > 0 && (
-                <span className="ml-1 text-xs bg-primaryblue/20 px-1.5 py-0.5 rounded">
+                <span className="ml-1 text-xs bg-primary/20 px-1.5 py-0.5 rounded">
                   {totalLinks}
                 </span>
               )}

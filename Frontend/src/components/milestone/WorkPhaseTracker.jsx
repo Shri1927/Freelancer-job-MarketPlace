@@ -30,8 +30,8 @@ const PHASE_STATUS_CONFIG = {
   in_progress: { 
     label: 'In Progress', 
     icon: <Clock className="h-4 w-4" />, 
-    color: 'text-primaryblue',
-    bgColor: 'bg-primaryblue/10'
+    color: 'text-primary',
+    bgColor: 'bg-primary/10'
   },
   completed: { 
     label: 'Completed', 
@@ -103,10 +103,10 @@ const WorkPhaseTracker = ({
   return (
     <div className="space-y-6">
       {/* Progress Overview */}
-      <div className="p-4 bg-gradient-to-r from-primaryblue/5 to-success/5 rounded-xl border border-border/50">
+      <div className="p-4 bg-gradient-to-r from-primary/5 to-success/5 rounded-xl border border-border/50">
         <div className="flex items-center justify-between mb-3">
           <h4 className="font-semibold text-foreground">Development Progress</h4>
-          <span className="text-2xl font-bold text-primaryblue">{progressPercent}%</span>
+          <span className="text-2xl font-bold text-primary">{progressPercent}%</span>
         </div>
         <Progress value={progressPercent} variant="success" className="h-3 mb-2" />
         
@@ -120,8 +120,8 @@ const WorkPhaseTracker = ({
             <div className="text-xl font-bold text-success">{completedCount}</div>
             <div className="text-xs text-muted-foreground">Completed</div>
           </div>
-          <div className="text-center p-2 bg-primaryblue/10 rounded-lg">
-            <div className="text-xl font-bold text-primaryblue">{inProgressCount}</div>
+          <div className="text-center p-2 bg-primary/10 rounded-lg">
+            <div className="text-xl font-bold text-primary">{inProgressCount}</div>
             <div className="text-xs text-muted-foreground">In Progress</div>
           </div>
           <div className="text-center p-2 bg-muted/30 rounded-lg">
@@ -139,7 +139,7 @@ const WorkPhaseTracker = ({
       <div className="p-4 bg-muted/30 rounded-lg border border-border/50">
         <div className="flex items-center justify-between mb-2">
           <span className="text-sm font-medium text-foreground">Deliverables Progress</span>
-          <span className="text-sm font-bold text-primaryblue">{deliverablePercent}%</span>
+          <span className="text-sm font-bold text-primary">{deliverablePercent}%</span>
         </div>
         <Progress value={deliverablePercent} className="h-2" />
         <p className="text-xs text-muted-foreground mt-2">
@@ -270,7 +270,7 @@ const WorkPhaseTracker = ({
                                           key={file.id}
                                           className="flex items-center gap-2 p-2 bg-background/50 rounded border border-border/30"
                                         >
-                                          <FileIcon className="h-3.5 w-3.5 text-primaryblue flex-shrink-0" />
+                                          <FileIcon className="h-3.5 w-3.5 text-primary flex-shrink-0" />
                                           <span className="text-xs text-foreground truncate flex-1">
                                             {file.name}
                                           </span>
@@ -346,9 +346,9 @@ const WorkPhaseTracker = ({
 
       {/* What's Next */}
       {inProgressCount > 0 && (
-        <div className="p-4 bg-primaryblue/5 rounded-lg border border-primaryblue/20">
+        <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
           <h5 className="font-medium text-foreground flex items-center gap-2 mb-2">
-            <ArrowRight className="h-4 w-4 text-primaryblue" />
+            <ArrowRight className="h-4 w-4 text-primary" />
             Currently Working On
           </h5>
           <div className="space-y-2">
@@ -358,7 +358,7 @@ const WorkPhaseTracker = ({
                 const remaining = phase.deliverables.filter(d => !d.completed).length;
                 return (
                   <div key={phase.id} className="flex items-center gap-2 text-sm">
-                    <Clock className="h-4 w-4 text-primaryblue" />
+                    <Clock className="h-4 w-4 text-primary" />
                     <span className="font-medium">{phase.name}</span>
                     <span className="text-muted-foreground">
                       - {remaining} deliverable{remaining !== 1 ? 's' : ''} remaining

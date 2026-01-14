@@ -60,7 +60,7 @@ const ExternalLinks = ({ links, onLinksChange }) => {
             variant="ghost"
             size="sm"
             onClick={() => setIsAdding(true)}
-            className="gap-1.5 text-primaryblue"
+            className="gap-1.5 text-primary"
           >
             <Plus className="h-4 w-4" />
             Add Link

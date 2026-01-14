@@ -139,23 +139,7 @@ export function ConversationList({ conversations, selectedId, onSelect }) {
         )}
       </div>
 
-      {/* User Status */}
-      <div className="p-4 border-t border-border bg-secondary/30">
-        <div className="flex items-center gap-3">
-          <div className="relative">
-            <Avatar className="h-10 w-10">
-              <AvatarImage src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face" />
-              <AvatarFallback>You</AvatarFallback>
-            </Avatar>
-            <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-primary border-2 border-card" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium truncate">Your Status</p>
-            <p className="text-xs text-muted-foreground">Available</p>
-          </div>
-          <button className="text-xs text-primary hover:underline">Edit</button>
-        </div>
-      </div>
+    
     </div>
   )
 }
@@ -189,7 +173,7 @@ function ConversationItem({ conversation, isSelected, onClick }) {
 
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between gap-2 mb-0.5">
-          <span className="font-semibold truncate flex items-center gap-1.5">
+          <span className="font-semibold truncate flex items-center gap-1.5 text-sm">
             {conversation.client.name}
             {conversation.isFavorite && (
               <Star className="h-3.5 w-3.5 fill-status-favorite text-status-favorite" />

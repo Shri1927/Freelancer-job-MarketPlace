@@ -16,7 +16,7 @@ import { cn } from '@/lib/utils';
 
 const STATUS_CONFIG = {
   pending: { label: 'Pending', icon: <Clock className="h-4 w-4" />, color: 'bg-muted text-muted-foreground' },
-  processing: { label: 'Processing', icon: <Loader2 className="h-4 w-4 animate-spin" />, color: 'bg-primaryblue text-primaryblue-foreground' },
+  processing: { label: 'Processing', icon: <Loader2 className="h-4 w-4 animate-spin" />, color: 'bg-primary text-primary-foreground' },
   completed: { label: 'Paid', icon: <CheckCircle2 className="h-4 w-4" />, color: 'bg-success text-success-foreground' },
   failed: { label: 'Failed', icon: <AlertCircle className="h-4 w-4" />, color: 'bg-destructive text-destructive-foreground' },
 };
@@ -35,10 +35,10 @@ const PaymentTracker = ({ milestones, currency }) => {
   return (
     <div className="space-y-6">
       {/* Payment Overview */}
-      <Card className="border-border/50 bg-gradient-to-br from-primaryblue/5 to-success/5">
+      <Card className="border-border/50 bg-gradient-to-br from-primary/5 to-success/5">
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center gap-2 text-lg">
-            <DollarSign className="h-5 w-5 text-primaryblue" />
+            <DollarSign className="h-5 w-5 text-primary" />
             Payment Overview
           </CardTitle>
         </CardHeader>
@@ -46,8 +46,8 @@ const PaymentTracker = ({ milestones, currency }) => {
           {/* Stats Grid */}
           <div className="grid grid-cols-3 gap-4">
             <div className="text-center p-4 bg-background/50 rounded-xl border border-border/50">
-              <div className="w-10 h-10 bg-primaryblue/10 rounded-full flex items-center justify-center mx-auto mb-2">
-                <TrendingUp className="h-5 w-5 text-primaryblue" />
+              <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-2">
+                <TrendingUp className="h-5 w-5 text-primary" />
               </div>
               <p className="text-2xl font-bold text-foreground">
                 {formatCurrency(totalAmount, currency)}
@@ -91,7 +91,7 @@ const PaymentTracker = ({ milestones, currency }) => {
       <Card className="border-border/50">
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center gap-2 text-lg">
-            <Receipt className="h-5 w-5 text-primaryblue" />
+            <Receipt className="h-5 w-5 text-primary" />
             Payment History
           </CardTitle>
         </CardHeader>
@@ -145,7 +145,7 @@ const PaymentTracker = ({ milestones, currency }) => {
       <Card className="border-border/50">
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center gap-2 text-lg">
-            <Clock className="h-5 w-5 text-primaryblue" />
+            <Clock className="h-5 w-5 text-primary" />
             Upcoming Payments
           </CardTitle>
         </CardHeader>

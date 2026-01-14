@@ -196,7 +196,7 @@ export function ChatWindow({ conversation, onSendMessage }) {
       </div>
 
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-4 scrollbar-thin bg-secondary/10">
+      <div className="flex-1 overflow-y-auto p-2 space-y-4 scrollbar-thin bg-secondary/10">
         {conversation.messages.map((msg, index) => (
           <MessageBubble
             key={msg.id}

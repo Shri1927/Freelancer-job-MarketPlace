@@ -29,7 +29,7 @@ import { cn } from '@/lib/utils';
 
 const FILE_ICONS = {
   image: <Image className="h-5 w-5 text-success" />,
-  document: <FileText className="h-5 w-5 text-primaryblue" />,
+  document: <FileText className="h-5 w-5 text-primary" />,
   code: <FileCode className="h-5 w-5 text-warning" />,
   default: <File className="h-5 w-5 text-muted-foreground" />,
 };
@@ -147,7 +147,7 @@ const UploadedFilesList = ({ files, onDelete }) => {
       {/* Stats */}
       <div className="flex items-center gap-4 p-3 bg-muted/30 rounded-lg">
         <div className="flex items-center gap-2">
-          <File className="h-4 w-4 text-primaryblue" />
+          <File className="h-4 w-4 text-primary" />
           <span className="text-sm font-medium">{filteredFiles.length} files</span>
         </div>
         <div className="flex items-center gap-2">

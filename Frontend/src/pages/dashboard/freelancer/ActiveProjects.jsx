@@ -128,65 +128,7 @@ export default function ActiveProjects() {
       <div className="flex gap-6 py-6">
         {/* Main Content */}
         <main className="flex-1 min-w-0">
-          {/* Top Dashboard Section */}
-          <div className="grid grid-cols-2 gap-6 mb-6">
-            <TodayPriorities
-              priorities={priorities}
-              onComplete={handleCompletePriority}
-              onSnooze={handleSnoozePriority}
-            />
-            <ProjectHealth projects={projects} />
-          </div>
-
-          {/* Stats Cards */}
-          <div className="grid grid-cols-4 gap-4 mb-6">
-            {[
-              {
-                title: "Active Projects",
-                value: stats.activeCount,
-                subtitle: "In progress",
-                icon: Briefcase,
-                variant: "primary",
-                delay: 0
-              },
-              {
-                title: "Total Earnings",
-                value: `$${stats.totalEarnings.toLocaleString()}`,
-                subtitle: "This month",
-                icon: DollarSign,
-                variant: "success",
-                trend: { value: 12, isPositive: true },
-                delay: 0.1
-              },
-              {
-                title: "Pending Payments",
-                value: `$${stats.pendingPayments.toLocaleString()}`,
-                subtitle: "Awaiting release",
-                icon: Clock,
-                variant: "warning",
-                delay: 0.2
-              },
-              {
-                title: "Urgent Deadlines",
-                value: stats.urgentDeadlines,
-                subtitle: "Within 3 days",
-                icon: AlertTriangle,
-                variant: stats.urgentDeadlines > 0 ? "danger" : "default",
-                delay: 0.3
-              }
-            ].map((stat) => (
-              <StatsCard
-                key={stat.title}
-                title={stat.title}
-                value={stat.value}
-                subtitle={stat.subtitle}
-                icon={stat.icon}
-                variant={stat.variant}
-                trend={stat.trend}
-              />
-            ))}
-          </div>
-
+       
           {/* Projects Grid */}
           <div
             className={

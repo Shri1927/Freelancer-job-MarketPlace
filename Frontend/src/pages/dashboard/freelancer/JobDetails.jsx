@@ -31,8 +31,7 @@ const JobDetails = () => {
         title: 'Senior React Developer for E-commerce Dashboard',
         category: 'Web Development', // ✅ NEW: Category
         rating: 4.8, // ✅ NEW: Client rating
-        shortDescription: 'We need an experienced React developer to build a comprehensive admin dashboard for our e-commerce platform. Key features include real-time sales analytics, user & order management, inventory tracking, Stripe integration, RBAC, and mobile-responsive design.', // ✅ NEW: Short JD
-        duration: '3 weeks', // ✅ NEW: Duration
+         duration: '3 weeks', // ✅ NEW: Duration
         location: 'Remote', // ✅ NEW: Location
         posted: '3h ago', // ✅ NEW: Posted time
         client: {
@@ -42,7 +41,6 @@ const JobDetails = () => {
             reviews: 23,
             verified: true,
             location: 'San Francisco, USA',
-            responseTime: '2h avg',
             hires: 15,
             successRate: 98
         },
@@ -92,10 +90,6 @@ $2,500 - $4,500 fixed price
             { name: 'api_docs.zip', size: '1.2 MB', url: 'https://github.com/jgraph/drawio/releases/download/v21.7.11/drawio-21.7.11-win.zip' },
             { name: 'design_mockups.fig', size: '892 KB', url: 'https://github.com/figma/plugin-samples/archive/refs/heads/master.zip' }
         ],
-        proposals: 9,
-        proposalsMax: 25,
-        views: 127,
-        matchScore: 92
     }
 
     const downloadFile = (fileUrl, fileName) => {
@@ -183,17 +177,17 @@ $2,500 - $4,500 fixed price
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        <div className="lg:col-span-2 space-y-8">
+                        <div className="lg:col-span-2 space-y-5">
                             {/* ✅ NEW: Dashboard-style Job Header */}
-                            <Card className="p-8 border-primary/20">
+                            <Card className="p-6 border-primary/20">
                                 <div className="flex flex-col lg:flex-row lg:items-start lg:gap-6">
                                     <div className="flex-1">
-                                        <Badge className="bg-gradient-to-r from-primary to-primary/80 mb-4 inline-flex items-center gap-1">
-                                            <Zap className="w-4 h-4" />
-                                            {job.matchScore}% Skills Match
-                                        </Badge>
+                                       
+                                        <div className="flex  gap-4 text-sm text-muted-foreground mb-3 ">
+                                            <span className='text-right'>Posted {job.posted}</span>
+                                        </div>
                                         <div className="flex flex-wrap items-start gap-4 mb-6">
-                                            <h1 className="text-3xl lg:text-4xl font-bold leading-tight flex-1 min-w-0 pr-4">
+                                            <h1 className="text-xl lg:text-2xl font-bold leading-tight flex-1 min-w-0 pr-4">
                                                 {job.title}
                                             </h1>
                                             <Badge variant="outline" className="whitespace-nowrap">
@@ -201,19 +195,8 @@ $2,500 - $4,500 fixed price
                                             </Badge>
                                         </div>
                                         {/* ✅ NEW: Dashboard-style info row */}
-                                        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-6 text-sm">
-                                            <div className="flex items-center gap-2 p-3 bg-gray-100 rounded-lg">
-                                                <Star className="w-4 h-4 text-orange-500 fill-orange-500" />
-                                                <span>{job.rating}</span>
-                                            </div>
-                                            <div className="flex items-center gap-2 p-3 bg-gray-100 rounded-lg">
-                                                <Users className="w-4 h-4" />
-                                                <span>{job.proposals}/{job.proposalsMax} proposals</span>
-                                            </div>
-                                            <div className="flex items-center gap-2 p-3 bg-gray-100 rounded-lg">
-                                                <Eye className="w-4 h-4" />
-                                                <span>{job.views} views</span>
-                                            </div>
+                                        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4  text-sm">
+                                           
                                             <div className="flex items-center gap-2 p-3 bg-primary/10 rounded-lg">
                                                 <DollarSign className="w-4 h-4 text-primary" />
                                                 <span>${job.budget.min.toLocaleString()}-${job.budget.max.toLocaleString()}</span>
@@ -228,20 +211,16 @@ $2,500 - $4,500 fixed price
                                             </div>
                                         </div>
                                         {/* ✅ NEW: Posted info */}
-                                        <div className="flex items-center gap-4 text-sm text-muted-foreground mb-6">
-                                            <span>Posted {job.posted}</span>
-                                        </div>
-                                        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-xl ">
-                                            <p className="text-muted-foreground mb-6">{job.description.split('\n\n')[0]}</p>
-                                        </div>
+                                        
                                     </div>
+                                    
                                 </div>
                             </Card>
 
                             {/* ✅ NEW: Skills Section */}
-                            <Card className="p-8 border-primary/20">
-                                <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-                                    <Zap className="w-6 h-6" />
+                            <Card className="p-6 border-primary/20">
+                                <h2 className="text-1xl font-bold mb-6 flex items-center gap-2">
+                                    <Zap className="w-4 h-4" />
                                     Skills
                                 </h2>
                                 <div className="flex flex-wrap gap-2">
@@ -253,8 +232,8 @@ $2,500 - $4,500 fixed price
                                 </div>
                             </Card>
 
-                            <Card className="p-8 border-primary/20">
-                                <h2 className="text-2xl font-bold mb-6">Project Overview</h2>
+                            <Card className="p-6 border-primary/20">
+                                <h2 className="text-xl font-bold mb-4">Project Overview</h2>
                                 <div className="prose prose-lg max-w-none leading-relaxed space-y-6">
 
                                     <div dangerouslySetInnerHTML={{
@@ -276,7 +255,7 @@ $2,500 - $4,500 fixed price
 
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <Card className="p-6 border-primary/20">
+                                <Card className="p-4 border-primary/20">
                                     <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
                                         <CheckCircle className="w-5 h-5 text-green-600" />
                                         Requirements
@@ -290,7 +269,7 @@ $2,500 - $4,500 fixed price
                                         ))}
                                     </ul>
                                 </Card>
-                                <Card className="p-6 border-primary/20">
+                                <Card className="p-4 border-primary/20">
                                     <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
                                         <FileText className="w-5 h-5" />
                                         Deliverables
@@ -356,10 +335,6 @@ $2,500 - $4,500 fixed price
                                                 <div className="flex items-center gap-1">
                                                     <MapPin className="w-4 h-4" />
                                                     <span>{job.client.location}</span>
-                                                </div>
-                                                <div className="flex items-center gap-1">
-                                                    <Clock className="w-4 h-4" />
-                                                    <span>{job.client.responseTime}</span>
                                                 </div>
                                             </div>
                                         </div>

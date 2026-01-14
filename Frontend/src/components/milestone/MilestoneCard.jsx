@@ -28,9 +28,9 @@ const MilestoneCard = ({ milestone, isSelected, onSelect, currency }) => {
       onClick={onSelect}
       className={cn(
         'w-full text-left p-4 rounded-xl border transition-all duration-300',
-        'hover:shadow-card-hover focus:outline-none focus:ring-2 focus:ring-primaryblue/20',
+        'hover:shadow-card-hover focus:outline-none focus:ring-2 focus:ring-primary/20',
         isSelected
-          ? 'bg-card border-primaryblue shadow-glow'
+          ? 'bg-card border-primary shadow-glow'
           : 'bg-card/50 border-border/50 hover:bg-card hover:border-border'
       )}
     >

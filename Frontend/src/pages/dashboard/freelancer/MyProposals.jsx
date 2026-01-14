@@ -429,7 +429,6 @@ $4,200 fixed price`,
     }
   };
 
-  const handleSendMessage = (clientName) => alert(`Opening chat with ${clientName}`);
   const handleViewDetails = (proposal) => setSelectedProposal(proposal);
   const handleDownloadProposal = (proposal) => alert(`Downloading proposal for: ${proposal.jobTitle}`);
   const formatDate = (dateString) => new Date(dateString).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
@@ -449,14 +448,9 @@ $4,200 fixed price`,
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Total Proposals</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+              <p className="text-xl font-bold text-gray-900">{stats.total}</p>
             </div>
             <div className="p-3 bg-blue-50 rounded-lg"><FileText className="w-6 h-6 text-blue-600" /></div>
-          </div>
-          <div className="mt-3 pt-3 border-t border-gray-100">
-            <p className="text-sm text-gray-500">
-              <span className="font-medium text-green-600">+2</span> this week
-            </p>
           </div>
         </div>
         {/* Success Rate */}
@@ -464,14 +458,9 @@ $4,200 fixed price`,
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Success Rate</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.successRate}</p>
+              <p className="text-xl font-bold text-gray-900">{stats.successRate}</p>
             </div>
             <div className="p-3 bg-emerald-50 rounded-lg"><TrendingUp className="w-6 h-6 text-emerald-600" /></div>
-          </div>
-          <div className="mt-3 pt-3 border-t border-gray-100">
-            <p className="text-sm text-gray-500">
-              <span className="font-medium text-emerald-600">↑ 5%</span> from last month
-            </p>
           </div>
         </div>
         {/* Active Conversations */}
@@ -479,12 +468,9 @@ $4,200 fixed price`,
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Active Conversations</p>
-              <p className="text-2xl font-bold text-gray-900">8</p>
+              <p className="text-xl font-bold text-gray-900">8</p>
             </div>
             <div className="p-3 bg-purple-50 rounded-lg"><MessageSquare className="w-6 h-6 text-purple-600" /></div>
-          </div>
-          <div className="mt-3 pt-3 border-t border-gray-100">
-            <p className="text-sm text-gray-500"><span className="font-medium text-purple-600">3 new</span> messages</p>
           </div>
         </div>
         {/* Avg Response */}
@@ -492,12 +478,9 @@ $4,200 fixed price`,
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Avg. Response Time</p>
-              <p className="text-2xl font-bold text-gray-900">2.5 days</p>
+              <p className="text-xl font-bold text-gray-900">2.5 days</p>
             </div>
             <div className="p-3 bg-amber-50 rounded-lg"><Clock className="w-6 h-6 text-amber-600" /></div>
-          </div>
-          <div className="mt-3 pt-3 border-t border-gray-100">
-            <p className="text-sm text-gray-500"><span className="font-medium text-amber-600">-0.5 days</span> improvement</p>
           </div>
         </div>
       </div>
@@ -546,24 +529,7 @@ $4,200 fixed price`,
         </div>
       </div>
 
-      {/* Status Summary */}
-      <div className="flex flex-wrap gap-3 mb-6">
-        {Object.entries(stats).slice(1, -1).map(([key, value]) => {
-          if (key === 'successRate') return null;
-          const config = getStatusConfig(key);
-          const Icon = config.icon;
-          return (
-            <div
-              key={key}
-              className={`px-4 py-2 rounded-full ${config.color} flex items-center gap-2 cursor-pointer hover:opacity-90 transition-opacity`}
-              onClick={() => setStatusFilter(key)}
-            >
-              <Icon className="w-4 h-4" />
-              <span className="font-medium">{value} {config.label}</span>
-            </div>
-          );
-        })}
-      </div>
+      
 
       {/* Proposals List */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
@@ -656,14 +622,7 @@ $4,200 fixed price`,
                         >
                           View
                         </button>
-                        <button
-                          onClick={() => handleSendMessage(proposal.client)}
-                          className="px-3 py-1.5 text-sm bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 transition-colors flex items-center gap-1"
-                          disabled={proposal.status === 'rejected'}
-                        >
-                          <MessageSquare className="w-3 h-3" />
-                          Chat
-                        </button>
+                       
                         {proposal.status === 'submitted' && (
                           <button
                             onClick={() => handleWithdrawProposal(proposal.id)}
@@ -672,14 +631,7 @@ $4,200 fixed price`,
                             Withdraw
                           </button>
                         )}
-                        {proposal.status === 'accepted' && (
-                          <button
-                            onClick={() => alert('View Contract')}
-                            className="px-3 py-1.5 text-sm bg-emerald-50 text-emerald-700 rounded-lg hover:bg-emerald-100 transition-colors"
-                          >
-                            Contract
-                          </button>
-                        )}
+                       
                       </div>
                     </td>
                   </tr>
@@ -737,13 +689,7 @@ $4,200 fixed price`,
                     View
                   </button>
 
-                  <button
-                    onClick={() => handleSendMessage(proposal.client)}
-                    disabled={proposal.status === 'rejected'}
-                    className="flex-1 bg-purple-50 text-purple-700 py-1.5 rounded-lg text-sm"
-                  >
-                    Chat
-                  </button>
+                  
 
                   {proposal.status === 'submitted' && (
                     <button
@@ -779,8 +725,8 @@ $4,200 fixed price`,
               {/* Header */}
               <div className="flex items-center justify-between mb-8">
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-900">Proposal Details</h2>
-                  <p className="text-gray-600 mt-1">Proposal for {selectedProposal.jobTitle}</p>
+                  <h2 className="text-xl font-bold text-gray-900">Proposal Details</h2>
+                  <p className="text-gray-600 mt-1 text-sm">Proposal for {selectedProposal.jobTitle}</p>
                 </div>
                 <button onClick={() => setSelectedProposal(null)} className="p-2 hover:bg-gray-100 rounded-lg">
                   <XCircle className="w-6 h-6 text-gray-400 hover:text-gray-600" />
@@ -792,8 +738,8 @@ $4,200 fixed price`,
                 <div className="lg:col-span-2 space-y-8">
 
                   {/* Project Overview Card (NEW) */}
-                  <Card className="p-8 border-primary/20">
-                    <h2 className="text-2xl font-bold mb-6">Project Overview</h2>
+                  <Card className="p-6 border-primary/20">
+                    <h2 className="text-xl font-bold mb-4">Project Overview</h2>
                    
                     <div className="prose prose-lg max-w-none leading-relaxed space-y-6">
 

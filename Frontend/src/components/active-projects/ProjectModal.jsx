@@ -36,7 +36,7 @@ export function ProjectModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col p-0 bg-gray-50">
+      <DialogContent className="max-w-6xl max-h-[100vh] overflow-hidden flex flex-col p-0 bg-gray-50">
         <DialogHeader className="px-6 pt-6 pb-0">
           <DialogTitle className="text-xl font-semibold">
             {project.title}

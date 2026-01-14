@@ -65,7 +65,7 @@ const TaskItem = ({ task, onStatusChange, onDelete }) => {
               'mt-0.5 flex-shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300',
               isCompleted
                 ? 'bg-success border-success text-success-foreground animate-check'
-                : 'border-muted-foreground/30 hover:border-primaryblue hover:bg-primaryblue-light'
+                : 'border-muted-foreground/30 hover:border-primary hover:bg-primary-light'
             )}
           >
             {isCompleted && <Check className="h-3.5 w-3.5" />}
@@ -128,7 +128,7 @@ const TaskItem = ({ task, onStatusChange, onDelete }) => {
                   Mark as Pending
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => onStatusChange(task.id, 'in_progress')}>
-                  <Clock className="h-4 w-4 mr-2 text-primaryblue" />
+                  <Clock className="h-4 w-4 mr-2 text-primary" />
                   Mark as In Progress
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => onStatusChange(task.id, 'completed')}>

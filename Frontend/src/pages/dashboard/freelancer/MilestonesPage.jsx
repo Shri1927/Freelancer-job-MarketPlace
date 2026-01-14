@@ -28,7 +28,7 @@ const MilestonesPage = () => {
   const allFiles = getAllFiles();
 
   return (
-    <div className="p-6  bg-gray-50">
+    <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-6 sm:py-8 max-w-7xl">
         {/* Project Header */}
         <ProjectHeader project={project} />

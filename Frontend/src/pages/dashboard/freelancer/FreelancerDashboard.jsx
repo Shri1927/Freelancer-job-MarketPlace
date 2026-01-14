@@ -99,7 +99,7 @@ import ActiveProjects from './ActiveProjects'
 import Discover from './Discover'
 import { MessagesLayout } from '@/components/messages/MessagesLayout'
 import MilestonesTasks from './MilestonesTasks'
-import Earning from './Earning'
+import Earning from './Earnings'
 import Withdraws from './Withdraws'
 import Transactions from './Transactions'
 import Portfolio from './Portfolio'
@@ -228,8 +228,6 @@ const FreelancerDashboard = () => {
         return <ActiveProjects />
       case 'messages':
         return <MessagesLayout />
-      case 'milestones':
-        return <MilestonesTasks/>
       case 'earnings':
         return <Earning/>
       case 'withdraw':
@@ -680,13 +678,6 @@ const FreelancerDashboard = () => {
                 </div>
                 <Badge variant="secondary" className="bg-primary text-white text-xs">6</Badge>
               </button>
-            </div>
-          </div>
-
-          {/* Communication */}
-          <div className="mb-6">
-            <h4 className="text-xs font-semibold text-muted-foreground uppercase mb-3">Communication</h4>
-            <div className="space-y-1">
               <button
                 onClick={() => {
                   setCurrentView('messages')
@@ -704,23 +695,9 @@ const FreelancerDashboard = () => {
                 </div>
                 <Badge variant="secondary" className="bg-primary text-white text-xs">5</Badge>
               </button>
-
-              <button
-                onClick={() => {
-                  setCurrentView('milestones')
-                  setSidebarOpen(false)
-                }}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${
-                  currentView === 'milestones'
-                    ? 'bg-primary/10 text-primary'
-                    : 'text-gray-700 hover:bg-gray-100'
-                }`}
-              >
-                <CheckSquare className="w-4 h-4" />
-                <span>Milestones & Task</span>
-              </button>
             </div>
           </div>
+
 
           {/* Financial */}
           <div className="mb-6">

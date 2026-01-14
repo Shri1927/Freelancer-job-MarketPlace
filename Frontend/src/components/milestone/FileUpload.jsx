@@ -5,7 +5,7 @@ import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
 
 const FILE_ICONS = {
-  image: <Image className="h-5 w-5 text-primaryblue" />,
+  image: <Image className="h-5 w-5 text-primary" />,
   document: <FileText className="h-5 w-5 text-success" />,
   archive: <Archive className="h-5 w-5 text-warning" />,
   video: <Video className="h-5 w-5 text-destructive" />,
@@ -129,7 +129,7 @@ const FileUpload = ({
       <div
         className={cn(
           'border-2 border-dashed rounded-xl p-8 text-center transition-all duration-200',
-          isDragging ? 'border-primaryblue bg-primaryblue/5' : 'border-border hover:border-primaryblue/50',
+          isDragging ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50',
           isUploading && 'pointer-events-none opacity-50'
         )}
         onDragOver={handleDragOver}
@@ -203,7 +203,7 @@ const FileUpload = ({
                         {file.name}
                       </p>
                       {file.version > 1 && (
-                        <span className="text-xs bg-primaryblue/10 text-primaryblue px-1.5 py-0.5 rounded">
+                        <span className="text-xs bg-primary/10 text-primary px-1.5 py-0.5 rounded">
                           v{file.version}
                         </span>
                       )}

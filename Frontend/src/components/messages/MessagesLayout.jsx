@@ -15,7 +15,6 @@ export function MessagesLayout() {
   const [conversations, setConversations] = useState(mockConversations)
   const [selectedConversationId, setSelectedConversationId] = useState("1")
   const [mobileView, setMobileView] = useState("list")
-  const [showCallsPanel, setShowCallsPanel] = useState(true)
 
   const selectedConversation =
     conversations.find(c => c.id === selectedConversationId) || null
@@ -133,28 +132,8 @@ export function MessagesLayout() {
         </div>
 
         {/* Right Panel - Calls (Collapsible) */}
-        <div
-          className={cn(
-            "transition-all duration-300 overflow-hidden",
-            showCallsPanel ? "w-[280px] xl:w-[320px]" : "w-0"
-          )}
-        >
-          <CallsHistory calls={mockCalls} />
-        </div>
-
-        {/* Toggle Calls Panel Button */}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setShowCallsPanel(!showCallsPanel)}
-          className="absolute right-0 top-1/2 -translate-y-1/2 z-10 h-12 w-6 rounded-l-lg rounded-r-none bg-card border border-r-0 border-border hidden lg:flex"
-        >
-          {showCallsPanel ? (
-            <X className="h-4 w-4" />
-          ) : (
-            <Phone className="h-4 w-4" />
-          )}
-        </Button>
+       
+        
       </div>
 
       {/* Mobile Layout */}
