@@ -18,7 +18,7 @@ import CreateContract from "./pages/CreateContract.jsx"
 import Workroom from "./pages/Workroom.jsx"
 import Feedback from "./pages/Feedback.jsx"
 import Contracts from "./pages/Contracts.jsx"
-import { useAuthStore } from '../src/store/auth.js'
+import { useAuthStore } from './store/auth.js'
 import OnboardingQuestionnaire from '../src/pages/create_profile/OnboardingQuestionnaire.jsx'
 import ProfileSetup from '../src/pages/create_profile/ProfileSetup.jsx'
 import RoleSelector from '../src/pages/create_profile/RoleSelector.jsx'

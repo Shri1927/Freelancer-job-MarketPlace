@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import JobCard from "@/components/JobCard";
@@ -6,24 +6,44 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search } from "lucide-react";
-import jobsData from "@/data/jobs.json";
+import { jobsAPI } from "@/services/api";
+import { toast } from "sonner";
 
 const Jobs = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [category, setCategory] = useState("all");
   const [experienceLevel, setExperienceLevel] = useState("all");
+  const [jobs, setJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredJobs = jobsData.filter((job) => {
-    const matchesSearch = job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         job.description.toLowerCase().includes(searchTerm.toLowerCase());
+  useEffect(() => {
+    loadJobs();
+  }, []);
+
+  const loadJobs = async () => {
+    try {
+      setLoading(true);
+      const response = await jobsAPI.getAll();
+      setJobs(response.data.data || response.data || []);
+    } catch (error) {
+      console.error('Error loading jobs:', error);
+      toast.error('Failed to load jobs');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filteredJobs = jobs.filter((job) => {
+    const matchesSearch = job.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         job.description?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = category === "all" || job.category === category;
-    const matchesExperience = experienceLevel === "all" || job.experienceLevel === experienceLevel;
+    const matchesExperience = experienceLevel === "all" || job.experience_level === experienceLevel;
     
     return matchesSearch && matchesCategory && matchesExperience;
   });
 
-  const categories = ["all", ...Array.from(new Set(jobsData.map(job => job.category)))];
-  const experienceLevels = ["all", ...Array.from(new Set(jobsData.map(job => job.experienceLevel)))];
+  const categories = ["all", ...Array.from(new Set(jobs.map(job => job.category).filter(Boolean)))];
+  const experienceLevels = ["all", ...Array.from(new Set(jobs.map(job => job.experience_level).filter(Boolean)))];
 
   return (
     <div className="min-h-screen">
@@ -95,18 +115,27 @@ const Jobs = () => {
         </div>
 
         {/* Job Listings */}
-        <div className="grid gap-6">
-          {filteredJobs.map((job, index) => (
-            <div key={job.id} className="animate-fade-in-up" style={{ animationDelay: `${0.2 + index * 0.05}s` }}>
-              <JobCard job={job} />
-            </div>
-          ))}
-        </div>
-
-        {filteredJobs.length === 0 && (
+        {loading ? (
           <div className="text-center py-12">
-            <p className="text-muted-foreground text-lg">No jobs found matching your criteria</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-muted-foreground text-lg">Loading jobs...</p>
           </div>
+        ) : (
+          <>
+            <div className="grid gap-6">
+              {filteredJobs.map((job, index) => (
+                <div key={job.id} className="animate-fade-in-up" style={{ animationDelay: `${0.2 + index * 0.05}s` }}>
+                  <JobCard job={job} />
+                </div>
+              ))}
+            </div>
+
+            {filteredJobs.length === 0 && (
+              <div className="text-center py-12">
+                <p className="text-muted-foreground text-lg">No jobs found matching your criteria</p>
+              </div>
+            )}
+          </>
         )}
       </div>
 

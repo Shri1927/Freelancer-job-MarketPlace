@@ -1,4 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { dashboardsAPI, projectsAPI, paymentsAPI } from '@/services/api'
+import { toast } from 'sonner'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import {
   Briefcase,
@@ -120,9 +122,44 @@ const FreelancerDashboard = () => {
   // State for current view
   const [currentView, setCurrentView] = useState('dashboard')
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [dashboardData, setDashboardData] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    loadDashboardData()
+  }, [])
+
+  const loadDashboardData = async () => {
+    try {
+      setLoading(true)
+      const [dashboardResponse, projectsResponse, earningsResponse] = await Promise.all([
+        dashboardsAPI.getFreelancerDashboard(),
+        projectsAPI.getFreelancerProjects(),
+        paymentsAPI.getTotalEarnings(),
+      ])
+      
+      setDashboardData({
+        dashboard: dashboardResponse.data,
+        projects: projectsResponse.data.data || projectsResponse.data || [],
+        totalEarnings: earningsResponse.data.total || 0,
+      })
+    } catch (error) {
+      console.error('Error loading dashboard:', error)
+      toast.error('Failed to load dashboard data')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   // Dashboard Overview Stats - UPDATED with all essential metrics
-  const stats = [
+  const stats = dashboardData ? [
+    { icon: DollarSign, label: 'Total Earnings', value: `$${dashboardData.totalEarnings.toLocaleString()}`, change: '+3,200', trend: 'up', color: 'text-green-600', bgColor: 'bg-green-100' },
+    { icon: Wallet, label: 'Available Balance', value: '$8,450', change: 'Ready to withdraw', trend: 'up', color: 'text-primary', bgColor: 'bg-primary/10' },
+    { icon: Clock, label: 'Pending Earnings', value: '$4,200', change: 'In progress', trend: 'neutral', color: 'text-yellow-600', bgColor: 'bg-yellow-100' },
+    { icon: Briefcase, label: 'Active Projects', value: String(dashboardData.projects.length || 0), change: '+2', trend: 'up', color: 'text-blue-600', bgColor: 'bg-blue-100' },
+    { icon: FileText, label: 'Proposals Sent', value: '18', change: '3 this week', trend: 'up', color: 'text-purple-600', bgColor: 'bg-purple-100' },
+    { icon: Star, label: 'Average Rating', value: '4.9', change: 'From 42 reviews', trend: 'up', color: 'text-orange-600', bgColor: 'bg-orange-100' }
+  ] : [
     { icon: DollarSign, label: 'Total Earnings', value: '$24,850', change: '+3,200', trend: 'up', color: 'text-green-600', bgColor: 'bg-green-100' },
     { icon: Wallet, label: 'Available Balance', value: '$8,450', change: 'Ready to withdraw', trend: 'up', color: 'text-primary', bgColor: 'bg-primary/10' },
     { icon: Clock, label: 'Pending Earnings', value: '$4,200', change: 'In progress', trend: 'neutral', color: 'text-yellow-600', bgColor: 'bg-yellow-100' },

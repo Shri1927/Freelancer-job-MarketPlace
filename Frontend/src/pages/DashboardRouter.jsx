@@ -1,30 +1,50 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
+import { useAuthStore } from "../store/auth"
 import ClientDashboard from "./dashboard/client/ClientDashboard"
 import FreelancerDashboard from "./dashboard/freelancer/FreelancerDashboard"
 import DashboardTest from "./DashboardTest"
 
 const DashboardRouter = () => {
   const navigate = useNavigate()
+  const { checkAuth, user } = useAuthStore()
   const [userType, setUserType] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}")
-    const type = userInfo.userType
+    const verifyAuth = async () => {
+      // First check if we have a token
+      const token = localStorage.getItem("auth_token")
+      if (!token) {
+        navigate("/signin")
+        return
+      }
 
-    console.log('DashboardRouter: userInfo =', userInfo)
-    console.log('DashboardRouter: type =', type)
+      // Verify token with backend
+      const isAuthenticated = await checkAuth()
+      if (!isAuthenticated) {
+        navigate("/signin")
+        return
+      }
 
-    if (!type) {
-      // If no user type is set, redirect to sign in
-      navigate("/signin")
-      return
+      // Get user info from store or localStorage
+      const userInfo = user || JSON.parse(localStorage.getItem("userInfo") || "{}")
+      const type = userInfo.userType || userInfo.role
+
+      console.log('DashboardRouter: userInfo =', userInfo)
+      console.log('DashboardRouter: type =', type)
+
+      if (!type) {
+        navigate("/signin")
+        return
+      }
+
+      setUserType(type)
+      setIsLoading(false)
     }
 
-    setUserType(type)
-    setIsLoading(false)
-  }, [navigate])
+    verifyAuth()
+  }, [navigate, checkAuth, user])
 
   if (isLoading) {
     return (

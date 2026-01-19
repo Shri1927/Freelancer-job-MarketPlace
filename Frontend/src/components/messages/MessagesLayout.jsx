@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { ConversationList } from "./ConversationList"
 import { ChatWindow } from "./ChatWindow"
 import { CallsHistory } from "./CallsHistory"
@@ -10,73 +10,85 @@ import {
 import { Menu, X, Phone } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { messagesAPI } from "@/services/api"
+import { useAuthStore } from "@/store/auth"
+import { toast } from "sonner"
 
 export function MessagesLayout() {
-  const [conversations, setConversations] = useState(mockConversations)
-  const [selectedConversationId, setSelectedConversationId] = useState("1")
+  const { user } = useAuthStore()
+  const [conversations, setConversations] = useState([])
+  const [selectedConversationId, setSelectedConversationId] = useState(null)
   const [mobileView, setMobileView] = useState("list")
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    loadConversations()
+  }, [])
+
+  const loadConversations = async () => {
+    try {
+      setLoading(true)
+      // Load conversations from projects
+      // Note: This may need a dedicated endpoint
+      const unreadCountResponse = await messagesAPI.getUnreadCount()
+      // For now, use mock data but structure it for API integration
+      setConversations(mockConversations)
+    } catch (error) {
+      console.error('Error loading conversations:', error)
+      toast.error('Failed to load conversations')
+      setConversations(mockConversations) // Fallback
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const selectedConversation =
     conversations.find(c => c.id === selectedConversationId) || null
 
-  const handleSendMessage = (conversationId, content) => {
-    const newMessage = {
-      id: `m${Date.now()}`,
-      conversationId,
-      senderId: currentUserId_export,
-      content,
-      timestamp: new Date(),
-      status: "sent",
-      type: "text"
-    }
-
-    setConversations(prev =>
-      prev.map(conv => {
-        if (conv.id === conversationId) {
-          return {
-            ...conv,
-            messages: [...conv.messages, newMessage],
-            lastMessage: content,
-            lastMessageTime: new Date()
-          }
-        }
-        return conv
+  const handleSendMessage = async (conversationId, content) => {
+    if (!conversationId || !content.trim()) return
+    
+    try {
+      // Extract project ID from conversation
+      const projectId = conversationId
+      await messagesAPI.send({
+        project_id: projectId,
+        message: content.trim(),
       })
-    )
+      
+      // Update local state
+      const newMessage = {
+        id: `m${Date.now()}`,
+        conversationId,
+        senderId: user?.id || currentUserId_export,
+        content,
+        timestamp: new Date(),
+        status: "sent",
+        type: "text"
+      }
 
-    // Simulate message delivery after 1 second
-    setTimeout(() => {
       setConversations(prev =>
         prev.map(conv => {
           if (conv.id === conversationId) {
             return {
               ...conv,
-              messages: conv.messages.map(msg =>
-                msg.id === newMessage.id ? { ...msg, status: "delivered" } : msg
-              )
+              messages: [...conv.messages, newMessage],
+              lastMessage: content,
+              lastMessageTime: new Date()
             }
           }
           return conv
         })
       )
-    }, 1000)
 
-    // Simulate message read after 3 seconds
-    setTimeout(() => {
-      setConversations(prev =>
-        prev.map(conv => {
-          if (conv.id === conversationId) {
-            return {
-              ...conv,
-              messages: conv.messages.map(msg =>
-                msg.id === newMessage.id ? { ...msg, status: "read" } : msg
-              )
-            }
-          }
-          return conv
-        })
-      )
-    }, 3000)
+      // Reload messages to get updated status
+      setTimeout(() => {
+        loadConversations()
+      }, 1000)
+    } catch (error) {
+      console.error('Error sending message:', error)
+      toast.error('Failed to send message')
+    }
   }
 
   const handleSelectConversation = id => {

@@ -6,348 +6,57 @@ import {
 } from 'lucide-react';
 import { Card } from "@/components/ui/card";
 import FreelancerSidebar from './FreelancerSidebar';
+import { proposalsAPI } from '@/services/api';
+import { toast } from 'sonner';
 
 const MyProposals = () => {
   // State for proposals
+  const [proposals, setProposals] = useState([]);
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    loadProposals();
+  }, []);
 
-  const [proposals, setProposals] = useState([
-    {
-      id: 1,
-      jobTitle: "Full-Stack Web Development for E-commerce Platform",
-      client: "TechCorp Inc.",
-      clientRating: 4.8,
-      budget: "$5,000 - $8,000",
-      submittedDate: "2024-01-15",
-      status: "submitted",
-      coverLetter: "I have extensive experience in building scalable e-commerce platforms using React, Node.js, and MongoDB...",
-      proposalAmount: "$6,500",
-      timeline: "4 weeks",
-      attachments: 2,
-      messages: 3,
-      lastUpdated: "2 days ago",
-      skills: ['React', 'Node.js', 'MongoDB', 'Express.js', 'Tailwind CSS'],
-
-      // NEW: Structured description like the job object
-      description: `Build a comprehensive e-commerce platform with user authentication, product management, shopping cart, payment integration, and admin dashboard.
-
-## Core Requirements
-• User authentication and authorization system  
-• Product catalog with search and filter functionality
-• Shopping cart and checkout system
-• Payment integration (Stripe/PayPal)
-• Admin dashboard for order management
-• Mobile-responsive design
-
-## Tech Stack
-• Frontend: React 18+, TypeScript, Tailwind CSS
-• Backend: Node.js/Express, MongoDB
-• Payment: Stripe API
-• Deployment: AWS/Vercel
-
-## Project Scope
-Complete e-commerce solution including frontend, backend, and database design.
-The platform should handle 1000+ concurrent users and be scalable for future growth.
-
-## Budget
-$6,500 fixed price (within client's $5,000 - $8,000 range)`,
-
-      // Keep existing
-      requirements: [
-        '5+ years experience with React and Node.js',
-        'Proven experience with e-commerce platforms',
-        'Stripe/PayPal payment integration expertise',
-        'MongoDB database design and optimization'
-      ],
-
-      // NEW: Add deliverables array
-      deliverables: [
-        'Fully functional e-commerce platform',
-        'Admin dashboard with analytics',
-        'Payment integration',
-        'Documentation and deployment guide',
-        'Source code with comments'
-      ],
-
-      projectDuration: "6 weeks"
-    },
-    {
-      id: 2,
-      jobTitle: "UI/UX Design for Mobile Banking App",
-      client: "Finance Solutions LLC",
-      clientRating: 4.5,
-      budget: "$3,000 - $5,000",
-      submittedDate: "2024-01-10",
-      status: "viewed",
-      coverLetter: "I specialize in creating intuitive banking interfaces with a focus on security and user experience...",
-      proposalAmount: "$4,200",
-      timeline: "3 weeks",
-      attachments: 1,
-      messages: 5,
-      lastUpdated: "1 day ago",
-      skills: ['Figma', 'UI/UX Design', 'Prototyping', 'User Research'],
-
-      // NEW: Structured description
-      description: `Design a modern, secure, and user-friendly mobile banking application interface.
-
-## Core Requirements
-• Secure login and authentication flows  
-• Dashboard with account overview
-• Money transfer and payment functionality
-• Transaction history and statements
-• Settings and profile management
-• Compliance with banking security standards
-
-## Design Principles
-• Clean, professional banking aesthetic
-• Emphasis on security and trust
-• Intuitive navigation for all age groups
-• Accessibility compliance (WCAG 2.1)
-• Cross-platform consistency
-
-## Deliverables
-Complete design system including wireframes, prototypes, and final designs.
-
-## Budget
-$4,200 fixed price`,
-
-      requirements: [
-        '3+ years mobile app UI/UX design experience',
-        'Portfolio showcasing fintech/banking projects',
-        'Expertise in Figma/Adobe XD',
-        'Knowledge of mobile design best practices'
-      ],
-
-      deliverables: [
-        'Wireframes and user flows',
-        'High-fidelity mockups',
-        'Interactive prototypes',
-        'Design system documentation',
-        'Assets for development handoff'
-      ],
-
-      projectDuration: "4 weeks"
-    },
-    {
-      id: 3,
-      jobTitle: "Content Marketing Strategy & Implementation",
-      client: "Growth Marketing Co.",
-      clientRating: 4.9,
-      budget: "$2,000 - $3,500",
-      submittedDate: "2024-01-05",
-      status: "shortlisted",
-      coverLetter: "With 5+ years in content strategy, I've helped brands increase organic traffic by 200%...",
-      proposalAmount: "$3,000",
-      timeline: "6 weeks",
-      attachments: 3,
-      messages: 8,
-      lastUpdated: "Today",
-      skills: ['SEO', 'Content Strategy', 'Copywriting', 'Analytics'],
-
-      // NEW: Structured description
-      description: `Develop and implement a comprehensive content marketing strategy.
-
-## Strategy Overview
-• Target audience research and persona development  
-• Content gap analysis and opportunity identification
-• Editorial calendar creation and management
-• Performance tracking and optimization
-
-## Content Types
-• Blog posts and articles (10 pieces)
-• Social media content strategy
-• Email marketing content
-• Case studies and success stories
-
-## Success Metrics
-• Increase organic traffic by 30% in 3 months
-• Improve keyword rankings for 20+ target keywords
-• Generate 50+ qualified leads monthly
-
-## Timeline
-6-week implementation period with weekly progress reports.`,
-
-      requirements: [
-        'Proven SEO skills with portfolio examples',
-        'Experience in content strategy for B2B companies',
-        'Strong writing and editing skills',
-        'Knowledge of Google Analytics and SEO tools'
-      ],
-
-      deliverables: [
-        'Content strategy document',
-        '10 high-quality blog posts',
-        'Content calendar for 3 months',
-        'SEO optimization report',
-        'Performance analytics dashboard'
-      ],
-
-      projectDuration: "8 weeks"
-    },
-    {
-      id: 4,
-      jobTitle: "SEO Optimization for Travel Website",
-      client: "Wanderlust Travel",
-      clientRating: 4.3,
-      budget: "$1,500 - $2,500",
-      submittedDate: "2024-01-12",
-      status: "accepted",
-      coverLetter: "Successfully improved travel website rankings by optimizing content and technical SEO...",
-      proposalAmount: "$2,000",
-      timeline: "2 weeks",
-      attachments: 2,
-      messages: 12,
-      lastUpdated: "Yesterday",
-
-      skills: ['SEO', 'Content Strategy', 'Copywriting'],
-      description: `Develop and implement a comprehensive content marketing strategy.
-
-## Strategy Overview
-• Target audience research and persona development  
-• Content gap analysis and opportunity identification
-• Editorial calendar creation and management
-• Performance tracking and optimization
-
-## Content Types
-• Blog posts and articles (10 pieces)
-• Social media content strategy
-• Email marketing content
-• Case studies and success stories
-
-## Success Metrics
-• Increase organic traffic by 30% in 3 months
-• Improve keyword rankings for 20+ target keywords
-• Generate 50+ qualified leads monthly
-
-## Timeline
-6-week implementation period with weekly progress reports.`,
-
-      requirements: [
-        'Proven SEO skills with portfolio examples',
-        'Experience in content strategy for B2B companies',
-        'Strong writing and editing skills',
-        'Knowledge of Google Analytics and SEO tools'
-      ],
-
-      deliverables: [
-        'Content strategy document',
-        '10 high-quality blog posts',
-        'Content calendar for 3 months',
-        'SEO optimization report',
-        'Performance analytics dashboard'
-      ],
-
-      projectDuration: "8 weeks"
-    },
-    {
-      id: 5,
-      jobTitle: "Mobile App Development (React Native)",
-      client: "Startup Innovations",
-      clientRating: 4.6,
-      budget: "$8,000 - $12,000",
-      submittedDate: "2024-01-08",
-      status: "rejected",
-      coverLetter: "Experienced in building cross-platform mobile apps with React Native and Firebase...",
-      proposalAmount: "$10,000",
-      timeline: "8 weeks",
-      attachments: 1,
-      messages: 2,
-      lastUpdated: "3 days ago",
-      skills: ['SEO', 'Content Strategy', 'Copywriting'],
-      description: `Develop and implement a comprehensive content marketing strategy.
-
-## Strategy Overview
-• Target audience research and persona development  
-• Content gap analysis and opportunity identification
-• Editorial calendar creation and management
-• Performance tracking and optimization
-
-## Content Types
-• Blog posts and articles (10 pieces)
-• Social media content strategy
-• Email marketing content
-• Case studies and success stories
-
-## Success Metrics
-• Increase organic traffic by 30% in 3 months
-• Improve keyword rankings for 20+ target keywords
-• Generate 50+ qualified leads monthly
-
-## Timeline
-6-week implementation period with weekly progress reports.`,
-
-      requirements: [
-        'Proven SEO skills with portfolio examples',
-        'Experience in content strategy for B2B companies',
-        'Strong writing and editing skills',
-        'Knowledge of Google Analytics and SEO tools'
-      ],
-
-      deliverables: [
-        'Content strategy document',
-        '10 high-quality blog posts',
-        'Content calendar for 3 months',
-        'SEO optimization report',
-        'Performance analytics dashboard'
-      ],
-
-      projectDuration: "8 weeks"
-    },
-    {
-      id: 6,
-      jobTitle: "Logo & Brand Identity Design",
-      client: "FreshStart Branding",
-      clientRating: 4.7,
-      budget: "$800 - $1,500",
-      submittedDate: "2024-01-18",
-      status: "submitted",
-      coverLetter: "Creating memorable brand identities that communicate core values effectively...",
-      proposalAmount: "$1,200",
-      timeline: "1 week",
-      attachments: 3,
-      messages: 0,
-      lastUpdated: "Just now",
-      skills: ['SEO', 'Content Strategy', 'Copywriting'],
-      description: `Develop and implement a comprehensive content marketing strategy.
-
-## Strategy Overview
-• Target audience research and persona development  
-• Content gap analysis and opportunity identification
-• Editorial calendar creation and management
-• Performance tracking and optimization
-
-## Content Types
-• Blog posts and articles (10 pieces)
-• Social media content strategy
-• Email marketing content
-• Case studies and success stories
-
-## Success Metrics
-• Increase organic traffic by 30% in 3 months
-• Improve keyword rankings for 20+ target keywords
-• Generate 50+ qualified leads monthly
-
-## Timeline
-6-week implementation period with weekly progress reports.`,
-
-      requirements: [
-        'Proven SEO skills with portfolio examples',
-        'Experience in content strategy for B2B companies',
-        'Strong writing and editing skills',
-        'Knowledge of Google Analytics and SEO tools'
-      ],
-
-      deliverables: [
-        'Content strategy document',
-        '10 high-quality blog posts',
-        'Content calendar for 3 months',
-        'SEO optimization report',
-        'Performance analytics dashboard'
-      ],
-
-      projectDuration: "8 weeks"
+  const loadProposals = async () => {
+    try {
+      setLoading(true);
+      // Note: This endpoint may need to be added to the backend
+      const response = await proposalsAPI.getMyProposals();
+      const proposalsData = response.data.data || response.data || [];
+      
+      // Transform API data to match component structure
+      const transformedProposals = proposalsData.map(proposal => ({
+        id: proposal.id,
+        jobTitle: proposal.job?.title || 'Untitled Job',
+        client: proposal.job?.client?.name || 'Client',
+        clientRating: proposal.job?.client?.rating || 0,
+        budget: proposal.job?.budget || '$0',
+        submittedDate: proposal.created_at || new Date().toISOString(),
+        status: proposal.status || 'submitted',
+        coverLetter: proposal.cover_letter || '',
+        proposalAmount: `$${proposal.amount || 0}`,
+        timeline: proposal.duration || 'N/A',
+        attachments: proposal.attachments?.length || 0,
+        messages: proposal.messages_count || 0,
+        lastUpdated: proposal.updated_at || proposal.created_at,
+        skills: proposal.job?.skills || [],
+        description: proposal.job?.description || '',
+        requirements: proposal.job?.requirements || [],
+        deliverables: proposal.job?.deliverables || [],
+        projectDuration: proposal.duration || 'N/A',
+      }));
+      
+      setProposals(transformedProposals);
+    } catch (error) {
+      console.error('Error loading proposals:', error);
+      toast.error('Failed to load proposals');
+      // Fallback to empty array
+      setProposals([]);
+    } finally {
+      setLoading(false);
     }
-  ]);
+  };
 
   // Filters, search, sort
   const [searchTerm, setSearchTerm] = useState('');

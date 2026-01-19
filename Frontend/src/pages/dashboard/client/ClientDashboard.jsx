@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Link, useLocation, useNavigate } from "react-router-dom"
 import {
   Sidebar,
@@ -69,8 +69,8 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/
 import { BarChart, Bar, LineChart as RechartsLineChart, Line, PieChart as RechartsPieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Legend } from "recharts"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { useAuthStore } from "@/store/auth"
-import jobsData from "@/data/jobs.json"
-import bidsData from "@/data/bids.json"
+import { dashboardsAPI, jobsAPI, projectsAPI } from "@/services/api"
+import { toast } from "sonner"
 
 const ClientDashboard = () => {
   const location = useLocation()
@@ -78,6 +78,34 @@ const ClientDashboard = () => {
   const { signOut, user } = useAuthStore()
   const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}")
   const userName = userInfo.name || "Client"
+  const [dashboardData, setDashboardData] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    loadDashboardData()
+  }, [])
+
+  const loadDashboardData = async () => {
+    try {
+      setLoading(true)
+      const [dashboardResponse, jobsResponse, projectsResponse] = await Promise.all([
+        dashboardsAPI.getClientDashboard(),
+        jobsAPI.getAll(),
+        projectsAPI.getClientProjects(),
+      ])
+      
+      setDashboardData({
+        dashboard: dashboardResponse.data,
+        jobs: jobsResponse.data.data || jobsResponse.data || [],
+        projects: projectsResponse.data.data || projectsResponse.data || [],
+      })
+    } catch (error) {
+      console.error('Error loading dashboard:', error)
+      toast.error('Failed to load dashboard data')
+    } finally {
+      setLoading(false)
+    }
+  }
   const userEmail = userInfo.email || "client@example.com"
 
   // Dashboard Overview Stats

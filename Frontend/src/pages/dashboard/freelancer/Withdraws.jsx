@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Wallet, DollarSign, CreditCard, History } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { WithdrawBalanceCard } from '@/components/withdraws/WithdrawBalanceCard';
@@ -6,12 +6,48 @@ import { WithdrawForm } from '@/components/withdraws/WithdrawForm';
 import { PaymentMethodManager } from '@/components/withdraws/PaymentMethodManager';
 import { WithdrawalHistory } from '@/components/withdraws/WithdrawalHistory';
 import { toast } from 'sonner';
+import { withdrawalsAPI, paymentsAPI } from '@/services/api';
 
 const Withdraws = () => {
-  // Mock data - Replace with actual API calls
-  const [availableBalance] = useState(8200);
-  const [pendingClearance] = useState(4200);
-  const [inProgress] = useState(3500);
+  const [availableBalance, setAvailableBalance] = useState(0);
+  const [pendingClearance, setPendingClearance] = useState(0);
+  const [inProgress, setInProgress] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadWithdrawalData()
+  }, [])
+
+  const loadWithdrawalData = async () => {
+    try {
+      setLoading(true)
+      const [withdrawalsResponse, earningsResponse] = await Promise.all([
+        withdrawalsAPI.getHistory(),
+        paymentsAPI.getTotalEarnings(),
+      ])
+      
+      const withdrawals = withdrawalsResponse.data.data || withdrawalsResponse.data || []
+      const totalEarnings = earningsResponse.data.total || 0
+      
+      // Calculate balances
+      const completed = withdrawals
+        .filter(w => w.status === 'completed')
+        .reduce((sum, w) => sum + parseFloat(w.amount || 0), 0)
+      
+      const processing = withdrawals
+        .filter(w => w.status === 'processing' || w.status === 'pending')
+        .reduce((sum, w) => sum + parseFloat(w.amount || 0), 0)
+      
+      setAvailableBalance(totalEarnings - completed - processing)
+      setPendingClearance(processing)
+      setInProgress(processing)
+    } catch (error) {
+      console.error('Error loading withdrawal data:', error)
+      toast.error('Failed to load withdrawal data')
+    } finally {
+      setLoading(false)
+    }
+  }
   const [paymentMethods, setPaymentMethods] = useState([
     {
       id: 'method-1',

@@ -1,5 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useParams, useNavigate } from 'react-router-dom'
+import { jobsAPI } from '@/services/api'
+import { toast } from 'sonner'
 import {
     ArrowLeft, Heart, MessageSquare, Download, CheckCircle,
     Star, MapPin, Clock, DollarSign, Users, Eye, FileText,
@@ -17,16 +19,67 @@ const JobDetails = () => {
     const { id } = useParams()
     const navigate = useNavigate()
     const [saved, setSaved] = useState(false)
+    const [job, setJob] = useState(null)
+    const [loading, setLoading] = useState(true)
     const [proposal, setProposal] = useState({
         coverLetter: '',
         hours: 40,
         rate: 45,
         deliveryDate: '2025-01-10'
     })
-    const [loading, setLoading] = useState(false)
+    const [submitting, setSubmitting] = useState(false)
     const [showSuccess, setShowSuccess] = useState(false)
 
-    const job = {
+    useEffect(() => {
+        loadJobDetails()
+    }, [id])
+
+    const loadJobDetails = async () => {
+        try {
+            setLoading(true)
+            const response = await jobsAPI.getById(id)
+            const jobData = response.data.data || response.data
+            
+            // Transform API data to match component structure
+            setJob({
+                id: jobData.id,
+                title: jobData.title,
+                category: jobData.category || 'Web Development',
+                rating: jobData.client?.rating || 4.8,
+                duration: jobData.duration || '3 weeks',
+                location: jobData.location || 'Remote',
+                posted: jobData.created_at ? new Date(jobData.created_at).toLocaleDateString() : 'Recently',
+                client: {
+                    name: jobData.client?.name || 'Client',
+                    avatar: jobData.client?.avatar || '',
+                    rating: jobData.client?.rating || 4.8,
+                    reviews: jobData.client?.reviews || 23,
+                    verified: jobData.client?.verified || true,
+                    location: jobData.client?.location || 'San Francisco, USA',
+                    hires: jobData.client?.hires || 15,
+                    successRate: jobData.client?.success_rate || 98
+                },
+                budget: {
+                    min: parseFloat(jobData.budget_min || 2500),
+                    max: parseFloat(jobData.budget_max || 4500),
+                    type: jobData.budget_type || 'fixed'
+                },
+                skills: Array.isArray(jobData.skills) ? jobData.skills : (jobData.skills_required || []),
+                description: jobData.description || '',
+                requirements: jobData.requirements || [],
+                deliverables: jobData.deliverables || [],
+                files: jobData.files || []
+            })
+        } catch (error) {
+            console.error('Error loading job:', error)
+            toast.error('Failed to load job details')
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    // Fallback job data if API fails
+    const fallbackJob = {
         id: parseInt(id) || 1,
         title: 'Senior React Developer for E-commerce Dashboard',
         category: 'Web Development', // ✅ NEW: Category
@@ -102,31 +155,55 @@ $2,500 - $4,500 fixed price
     }
 
     const handleMessageClient = () => {
-        alert(`💬 Chat opened with ${job.client.name}\n\nMessage them about "${job.title}"`)
+        alert(`💬 Chat opened with ${currentJob.client.name}\n\nMessage them about "${currentJob.title}"`)
     }
 
     const submitProposal = async (e) => {
         e.preventDefault()
         if (!proposal.coverLetter.trim()) {
-            alert('Please add a cover letter!')
+            toast.error('Please add a cover letter!')
             return
         }
 
-        setLoading(true)
-        await new Promise(resolve => setTimeout(resolve, 1500))
-        setLoading(false)
-        setShowSuccess(true)
-        setProposal({ coverLetter: '', hours: 40, rate: 45, deliveryDate: '2025-01-10' })
+        setSubmitting(true)
+        try {
+            await jobsAPI.apply(id, {
+                amount: proposal.rate * proposal.hours,
+                duration: `${proposal.hours} hours`,
+                cover_letter: proposal.coverLetter,
+            })
+            
+            setShowSuccess(true)
+            setProposal({ coverLetter: '', hours: 40, rate: 45, deliveryDate: '2025-01-10' })
+        } catch (error) {
+            console.error('Error submitting proposal:', error)
+            toast.error(error.response?.data?.message || 'Failed to submit proposal')
+        } finally {
+            setSubmitting(false)
+        }
     }
 
     const quickApply = () => {
         setProposal(prev => ({
             ...prev,
-            coverLetter: `Hi ${job.client.name},\n\nI'm excited about your React dashboard project. With 5+ years of React/TypeScript experience and recent e-commerce projects, I can deliver:\n\n✅ Real-time analytics\n✅ Stripe integration\n✅ Mobile-responsive design\n\nI can complete this in 3 weeks for $${(prev.rate * prev.hours).toLocaleString()}.\n\nLooking forward to discussing!\n\nBest,\n[Your Name]`
+            coverLetter: `Hi ${currentJob.client.name},\n\nI'm excited about your React dashboard project. With 5+ years of React/TypeScript experience and recent e-commerce projects, I can deliver:\n\n✅ Real-time analytics\n✅ Stripe integration\n✅ Mobile-responsive design\n\nI can complete this in 3 weeks for $${(prev.rate * prev.hours).toLocaleString()}.\n\nLooking forward to discussing!\n\nBest,\n[Your Name]`
         }))
     }
 
     const toggleSave = () => setSaved(!saved)
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                    <p className="text-muted-foreground">Loading job details...</p>
+                </div>
+            </div>
+        )
+    }
+
+    const currentJob = job || fallbackJob
 
     return (
         <>
@@ -184,14 +261,14 @@ $2,500 - $4,500 fixed price
                                     <div className="flex-1">
                                        
                                         <div className="flex  gap-4 text-sm text-muted-foreground mb-3 ">
-                                            <span className='text-right'>Posted {job.posted}</span>
+                                            <span className='text-right'>Posted {currentJob.posted}</span>
                                         </div>
                                         <div className="flex flex-wrap items-start gap-4 mb-6">
                                             <h1 className="text-xl lg:text-2xl font-bold leading-tight flex-1 min-w-0 pr-4">
-                                                {job.title}
+                                                {currentJob.title}
                                             </h1>
                                             <Badge variant="outline" className="whitespace-nowrap">
-                                                {job.category}
+                                                {currentJob.category}
                                             </Badge>
                                         </div>
                                         {/* ✅ NEW: Dashboard-style info row */}
@@ -199,15 +276,15 @@ $2,500 - $4,500 fixed price
                                            
                                             <div className="flex items-center gap-2 p-3 bg-primary/10 rounded-lg">
                                                 <DollarSign className="w-4 h-4 text-primary" />
-                                                <span>${job.budget.min.toLocaleString()}-${job.budget.max.toLocaleString()}</span>
+                                                <span>${currentJob.budget.min.toLocaleString()}-${currentJob.budget.max.toLocaleString()}</span>
                                             </div>
                                             <div className="flex items-center gap-2 p-3 bg-blue-100 rounded-lg">
                                                 <Clock className="w-4 h-4 text-blue-600" />
-                                                <span>{job.duration}</span>
+                                                <span>{currentJob.duration}</span>
                                             </div>
                                             <div className="flex items-center gap-2 p-3 bg-green-100 rounded-lg">
                                                 <MapPin className="w-4 h-4 text-green-600" />
-                                                <span>{job.location}</span>
+                                                <span>{currentJob.location}</span>
                                             </div>
                                         </div>
                                         {/* ✅ NEW: Posted info */}
@@ -224,9 +301,9 @@ $2,500 - $4,500 fixed price
                                     Skills
                                 </h2>
                                 <div className="flex flex-wrap gap-2">
-                                    {job.skills.map((skill, i) => (
+                                    {currentJob.skills.map((skill, i) => (
                                         <Badge key={i} variant="secondary" className="px-4 py-2 text-sm">
-                                            {skill}
+                                            {typeof skill === 'string' ? skill : skill.name || skill}
                                         </Badge>
                                     ))}
                                 </div>
@@ -239,7 +316,7 @@ $2,500 - $4,500 fixed price
                                     <div dangerouslySetInnerHTML={{
                                         __html: `
       <div class="space-y-8">
-        ${job.description.split('\n\n').slice(1).map(section =>
+        ${(currentJob.description || '').split('\n\n').slice(1).map(section =>
                                             section.includes('##') ?
                                                 `<div class="space-y-4">
             <h3 class="text-xl font-bold text-primary">${section.split('\n')[0].replace('## ', '')}</h3>
@@ -261,7 +338,7 @@ $2,500 - $4,500 fixed price
                                         Requirements
                                     </h3>
                                     <ul className="space-y-2">
-                                        {job.requirements.map((req, i) => (
+                                        {(currentJob.requirements || []).map((req, i) => (
                                             <li key={i} className="flex items-start gap-2 text-muted-foreground">
                                                 <div className="w-2 h-2 bg-green-600 rounded-full mt-2 flex-shrink-0" />
                                                 <span>{req}</span>
@@ -275,7 +352,7 @@ $2,500 - $4,500 fixed price
                                         Deliverables
                                     </h3>
                                     <ul className="space-y-2">
-                                        {job.deliverables.map((del, i) => (
+                                        {(currentJob.deliverables || []).map((del, i) => (
                                             <li key={i} className="flex items-start gap-2 text-muted-foreground">
                                                 <div className="w-2 h-2 bg-blue-600 rounded-full mt-2 flex-shrink-0" />
                                                 <span>{del}</span>
@@ -285,10 +362,11 @@ $2,500 - $4,500 fixed price
                                 </Card>
                             </div>
 
-                            <Card className="p-6 border-primary/20">
-                                <h3 className="text-xl font-semibold mb-4">Attached Files</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    {job.files.map((file, i) => (
+                            {(currentJob.files || []).length > 0 && (
+                                <Card className="p-6 border-primary/20">
+                                    <h3 className="text-xl font-semibold mb-4">Attached Files</h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        {currentJob.files.map((file, i) => (
                                         <Button
                                             key={i}
                                             variant="outline"
@@ -304,6 +382,7 @@ $2,500 - $4,500 fixed price
                                     ))}
                                 </div>
                             </Card>
+                            )}
                         </div>
 
                         <div className="space-y-6">
@@ -317,14 +396,14 @@ $2,500 - $4,500 fixed price
                                             </AvatarFallback>
                                         </Avatar>
                                         <div className="flex-1 min-w-0">
-                                            <h4 className="font-semibold text-lg truncate">{job.client.name}</h4>
+                                            <h4 className="font-semibold text-lg truncate">{currentJob.client.name}</h4>
                                             <div className="flex items-center gap-2 mb-1">
                                                 <div className="flex items-center gap-1">
                                                     <Star className="w-4 h-4 text-orange-500 fill-orange-500" />
-                                                    <span className="font-medium">{job.client.rating}</span>
-                                                    <span className="text-sm text-muted-foreground">({job.client.reviews})</span>
+                                                    <span className="font-medium">{currentJob.client.rating}</span>
+                                                    <span className="text-sm text-muted-foreground">({currentJob.client.reviews})</span>
                                                 </div>
-                                                {job.client.verified && (
+                                                {currentJob.client.verified && (
                                                     <Badge variant="outline" className="gap-1 text-xs">
                                                         <Shield className="w-3 h-3" />
                                                         Verified
@@ -334,7 +413,7 @@ $2,500 - $4,500 fixed price
                                             <div className="flex items-center gap-4 text-sm text-muted-foreground">
                                                 <div className="flex items-center gap-1">
                                                     <MapPin className="w-4 h-4" />
-                                                    <span>{job.client.location}</span>
+                                                    <span>{currentJob.client.location}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -342,11 +421,11 @@ $2,500 - $4,500 fixed price
                                     <div className="grid grid-cols-2 gap-2 text-sm">
                                         <div className="flex items-center gap-2 p-3 bg-primary/10 rounded-lg">
                                             <Users className="w-4 h-4 text-primary" />
-                                            <span>{job.client.hires} hires</span>
+                                            <span>{currentJob.client.hires} hires</span>
                                         </div>
                                         <div className="flex items-center gap-2 p-3 bg-green-100 rounded-lg">
                                             <Award className="w-4 h-4 text-green-700" />
-                                            <span>{job.client.successRate}% success</span>
+                                            <span>{currentJob.client.successRate}% success</span>
                                         </div>
                                     </div>
                                     <Button className="w-full bg-gradient-to-r from-primary to-primary/80" onClick={handleMessageClient}>
@@ -393,10 +472,10 @@ $2,500 - $4,500 fixed price
                                     <Button
                                         type="submit"
                                         className="w-full h-14 bg-gradient-to-r from-primary to-primary/80 text-lg"
-                                        disabled={loading || !proposal.coverLetter.trim()}
+                                        disabled={submitting || !proposal.coverLetter.trim()}
                                     >
                                         <Send className="w-5 h-5 mr-2" />
-                                        {loading ? 'Submitting...' : 'Submit Proposal'}
+                                        {submitting ? 'Submitting...' : 'Submit Proposal'}
                                     </Button>
                                 </form>
                             </Card>

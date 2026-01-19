@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { clientProfileAPI } from '../services/api';
+import { toast } from 'sonner';
 
 const ClientProfile = () => {
-       const navigate = useNavigate(); 
-  const [companyName, setCompanyName] = useState('Active Hub');
+  const navigate = useNavigate(); 
+  const [companyName, setCompanyName] = useState('');
   const [selectedIndustry, setSelectedIndustry] = useState('');
   const [selectedCompanySize, setSelectedCompanySize] = useState('');
   const [showIndustryDropdown, setShowIndustryDropdown] = useState(false);
   const [showSizeDropdown, setShowSizeDropdown] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const industries = [
     'Technology',
@@ -28,8 +31,28 @@ const ClientProfile = () => {
     '501-1000 employees',
     '1000+ employees'
   ];
-    const handleNext = () => {
-    navigate('/dashboard'); 
+  const handleNext = async () => {
+    if (!companyName || !selectedIndustry || !selectedCompanySize) {
+      toast.error('Please fill in all fields');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await clientProfileAPI.create({
+        company_name: companyName,
+        industry: selectedIndustry,
+        company_size: selectedCompanySize,
+      });
+      
+      toast.success('Profile created successfully!');
+      navigate('/dashboard'); 
+    } catch (error) {
+      console.error('Error creating client profile:', error);
+      toast.error(error.response?.data?.message || 'Failed to create profile');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleIndustrySelect = (industry) => {
@@ -134,8 +157,12 @@ const ClientProfile = () => {
             <button className="flex-1 px-6 py-3 border-2 border-primary rounded-lg bg-background text-primary font-semibold text-base transition-all hover:bg-secondary hover:shadow-soft">
               Back
             </button>
-            <button className="flex-1 px-6 py-3 border-0 rounded-lg bg-gradient-to-br from-[hsl(28_90%_55%)] to-[hsl(16_90%_50%)] text-primary-foreground font-semibold text-base transition-all hover:shadow-medium hover:from-[hsl(28_95%_65%)] hover:to-[hsl(16_95%_55%)]" onClick={handleNext}>
-              Create Account
+            <button 
+              className="flex-1 px-6 py-3 border-0 rounded-lg bg-gradient-to-br from-[hsl(28_90%_55%)] to-[hsl(16_90%_50%)] text-primary-foreground font-semibold text-base transition-all hover:shadow-medium hover:from-[hsl(28_95%_65%)] hover:to-[hsl(16_95%_55%)] disabled:opacity-50 disabled:cursor-not-allowed" 
+              onClick={handleNext}
+              disabled={loading}
+            >
+              {loading ? 'Creating...' : 'Create Account'}
             </button>
           </div>
         </div>

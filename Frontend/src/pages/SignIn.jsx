@@ -7,7 +7,7 @@ import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 export default function SignIn() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { signIn, signInWithGoogle, signInWithFacebook, setUser } = useAuthStore();
+  const { signIn, signInWithGoogle, signInWithFacebook } = useAuthStore();
 
   // Get role from state or default to 'freelancer'
   const role = location.state?.role || 'freelancer';
@@ -29,31 +29,6 @@ export default function SignIn() {
     setError('');
   };
 
-  // Mock authentication function
-  const mockSignIn = async (email, password) => {
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Simple mock authentication - in real app, this would be an API call
-    if (email && password.length >= 6) {
-      return {
-        success: true,
-        user: {
-          id: '1',
-          email: email,
-          name: email.split('@')[0],
-          role: role, // Use the selected role from the route
-          avatar: `https://ui-avatars.com/api/?name=${email.split('@')[0]}&background=0D8ABC&color=fff`
-        }
-      };
-    } else {
-      return {
-        success: false,
-        error: 'Invalid email or password'
-      };
-    }
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -71,25 +46,10 @@ export default function SignIn() {
     setLoading(true);
 
     try {
-      // Use mock authentication for testing
-      const result = await mockSignIn(formData.email, formData.password);
+      // Use real API authentication
+      const result = await signIn(formData.email, formData.password);
 
       if (result.success) {
-        // Store user data in localStorage
-        localStorage.setItem('userInfo', JSON.stringify({
-          id: result.user.id,
-          email: result.user.email,
-          name: result.user.name,
-          role: result.user.role,
-          userType: result.user.role,
-          avatar: result.user.avatar
-        }));
-        
-        // Update auth store with user data
-        if (setUser) {
-          setUser(result.user);
-        }
-        
         console.log('Sign in successful, navigating to /dashboard');
         navigate('/dashboard');
       } else {

@@ -1,4 +1,5 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useParams } from "react-router-dom"
 import Navbar from "@/components/Navbar"
 import Footer from "@/components/Footer"
 import { Card } from "@/components/ui/card"
@@ -6,27 +7,76 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { toast } from "sonner"
+import { projectsAPI } from "@/services/api"
 
 const Workroom = () => {
+  const { projectId } = useParams()
   const [diary, setDiary] = useState([])
   const [hours, setHours] = useState("")
   const [submission, setSubmission] = useState("")
+  const [project, setProject] = useState(null)
+  const [loading, setLoading] = useState(true)
 
-  const addHours = () => {
-    if (!hours) return
-    setDiary(prev => [...prev, { id: Date.now(), hours }])
-    setHours("")
+  useEffect(() => {
+    if (projectId) {
+      loadProject()
+    }
+  }, [projectId])
+
+  const loadProject = async () => {
+    try {
+      setLoading(true)
+      const response = await projectsAPI.getById(projectId)
+      setProject(response.data.data || response.data)
+    } catch (error) {
+      console.error('Error loading project:', error)
+      toast.error('Failed to load project')
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const submitWork = () => {
-    if (!submission.trim()) return
-    toast.success("Work submitted for review")
-    setSubmission("")
+  const addHours = async () => {
+    if (!hours || !projectId) return
+    try {
+      await projectsAPI.updateProgress(projectId, {
+        hours: parseFloat(hours),
+        note: 'Hours logged',
+      })
+      setDiary(prev => [...prev, { id: Date.now(), hours }])
+      setHours("")
+      toast.success("Hours logged successfully")
+    } catch (error) {
+      console.error('Error logging hours:', error)
+      toast.error('Failed to log hours')
+    }
   }
 
-  const approve = () => {
-    toast.success("Approved. Payment released (minus platform fee)")
-    window.location.href = "/feedback"
+  const submitWork = async () => {
+    if (!submission.trim() || !projectId) return
+    try {
+      await projectsAPI.updateProgress(projectId, {
+        submission: submission.trim(),
+        status: 'submitted',
+      })
+      toast.success("Work submitted for review")
+      setSubmission("")
+    } catch (error) {
+      console.error('Error submitting work:', error)
+      toast.error('Failed to submit work')
+    }
+  }
+
+  const approve = async () => {
+    if (!projectId) return
+    try {
+      await projectsAPI.updateStatus(projectId, 'completed')
+      toast.success("Approved. Payment released (minus platform fee)")
+      window.location.href = "/feedback"
+    } catch (error) {
+      console.error('Error approving work:', error)
+      toast.error('Failed to approve work')
+    }
   }
 
   return (
