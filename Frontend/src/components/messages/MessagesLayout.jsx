@@ -20,6 +20,7 @@ export function MessagesLayout() {
   const [selectedConversationId, setSelectedConversationId] = useState(null)
   const [mobileView, setMobileView] = useState("list")
   const [loading, setLoading] = useState(true)
+  const [hasRealProjects, setHasRealProjects] = useState(false)
 
   useEffect(() => {
     loadConversations()
@@ -28,15 +29,74 @@ export function MessagesLayout() {
   const loadConversations = async () => {
     try {
       setLoading(true)
-      // Load conversations from projects
-      // Note: This may need a dedicated endpoint
-      const unreadCountResponse = await messagesAPI.getUnreadCount()
-      // For now, use mock data but structure it for API integration
-      setConversations(mockConversations)
+      
+      // Load projects based on user role
+      let projects = []
+      if (user?.role === 'freelancer') {
+        const response = await fetch('http://localhost:8000/api/freelancer/projects', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
+            'Content-Type': 'application/json',
+          }
+        })
+        if (response.ok) {
+          const data = await response.json()
+          projects = data
+        }
+      } else if (user?.role === 'client') {
+        const response = await fetch('http://localhost:8000/api/client/projects', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
+            'Content-Type': 'application/json',
+          }
+        })
+        if (response.ok) {
+          const data = await response.json()
+          projects = data
+        }
+      }
+      
+      // Transform projects into conversations format
+      const conversationsData = projects.map(project => {
+        // Determine who the "other person" is based on user role
+        const otherPerson = user?.role === 'freelancer' 
+          ? project.client 
+          : project.freelancer
+        
+        return {
+          id: project.id, // Use project ID as conversation ID
+          client: {
+            name: otherPerson?.name || 'Unknown User',
+            avatar: null,
+            online: false,
+            lastSeen: 'Recently',
+            rating: 0
+          },
+          project: project.title,
+          lastMessage: "Start a conversation...",
+          lastMessageTime: new Date(project.updated_at || project.created_at),
+          unreadCount: 0,
+          isOnline: false,
+          isFavorite: false,
+          isGroup: false,
+          isArchived: false,
+          messages: []
+        }
+      })
+      
+      setConversations(conversationsData)
+      setHasRealProjects(true)
+      
+      // If no projects, show mock data for demo
+      if (conversationsData.length === 0) {
+        setConversations(mockConversations)
+        setHasRealProjects(false)
+        toast.info('No active projects yet. Create a project to start messaging!')
+      }
     } catch (error) {
       console.error('Error loading conversations:', error)
       toast.error('Failed to load conversations')
-      setConversations(mockConversations) // Fallback
+      setConversations(mockConversations) // Fallback to mock data
     } finally {
       setLoading(false)
     }
@@ -48,21 +108,30 @@ export function MessagesLayout() {
   const handleSendMessage = async (conversationId, content) => {
     if (!conversationId || !content.trim()) return
     
+    // Prevent sending messages to mock conversations
+    if (!hasRealProjects) {
+      toast.error('Cannot send messages to demo conversations. Please create a project first!')
+      return
+    }
+    
     try {
       // Extract project ID from conversation
       const projectId = conversationId
-      await messagesAPI.send({
+      const response = await messagesAPI.send({
         project_id: projectId,
         message: content.trim(),
       })
       
-      // Update local state
+      // Get the saved message from the backend
+      const savedMessage = response.data
+      
+      // Update local state with the actual saved message
       const newMessage = {
-        id: `m${Date.now()}`,
+        id: savedMessage.id,
         conversationId,
-        senderId: user?.id || currentUserId_export,
-        content,
-        timestamp: new Date(),
+        senderId: savedMessage.sender_id,
+        content: savedMessage.message,
+        timestamp: new Date(savedMessage.created_at),
         status: "sent",
         type: "text"
       }
@@ -72,7 +141,7 @@ export function MessagesLayout() {
           if (conv.id === conversationId) {
             return {
               ...conv,
-              messages: [...conv.messages, newMessage],
+              messages: [...(conv.messages || []), newMessage],
               lastMessage: content,
               lastMessageTime: new Date()
             }
@@ -80,23 +149,60 @@ export function MessagesLayout() {
           return conv
         })
       )
-
-      // Reload messages to get updated status
-      setTimeout(() => {
-        loadConversations()
-      }, 1000)
+      
+      toast.success('Message sent!')
     } catch (error) {
       console.error('Error sending message:', error)
-      toast.error('Failed to send message')
+      if (error.response?.status === 404) {
+        toast.error('Project not found. Please refresh and try again.')
+      } else if (error.response?.status === 403) {
+        toast.error('You do not have access to this project.')
+      } else {
+        toast.error('Failed to send message. Please try again.')
+      }
     }
   }
 
-  const handleSelectConversation = id => {
+  const handleSelectConversation = async (id) => {
     setSelectedConversationId(id)
-    // Clear unread count
-    setConversations(prev =>
-      prev.map(conv => (conv.id === id ? { ...conv, unreadCount: 0 } : conv))
-    )
+    
+    // Load messages for this conversation (project)
+    try {
+      const response = await messagesAPI.getByProject(id)
+      const messages = response.data || []
+      
+      // Transform backend messages to frontend format
+      const formattedMessages = messages.map(msg => ({
+        id: msg.id,
+        conversationId: id,
+        senderId: msg.sender_id,
+        content: msg.message,
+        timestamp: new Date(msg.created_at),
+        status: "sent",
+        type: "text"
+      }))
+      
+      // Update conversation with loaded messages
+      setConversations(prev =>
+        prev.map(conv => {
+          if (conv.id === id) {
+            return {
+              ...conv,
+              messages: formattedMessages,
+              unreadCount: 0,
+              lastMessage: formattedMessages.length > 0 
+                ? formattedMessages[formattedMessages.length - 1].content 
+                : conv.lastMessage
+            }
+          }
+          return conv
+        })
+      )
+    } catch (error) {
+      console.error('Error loading messages:', error)
+      toast.error('Failed to load messages')
+    }
+    
     // On mobile, switch to chat view
     setMobileView("chat")
   }
@@ -136,7 +242,13 @@ export function MessagesLayout() {
         </div>
 
         {/* Center Panel - Chat */}
-        <div className="flex-1 flex min-w-0">
+        <div className="flex-1 flex min-w-0 flex-col">
+          {!hasRealProjects && selectedConversation && (
+            <div className="bg-yellow-500/10 border-b border-yellow-500/20 px-4 py-2 text-sm text-yellow-700 dark:text-yellow-400 flex items-center justify-center gap-2">
+              <span className="font-semibold">Demo Mode:</span>
+              <span>This is a demo conversation. Create a project to enable messaging.</span>
+            </div>
+          )}
           <ChatWindow
             conversation={selectedConversation}
             onSendMessage={handleSendMessage}
@@ -167,6 +279,12 @@ export function MessagesLayout() {
             >
               ← Back to chats
             </Button>
+            {!hasRealProjects && selectedConversation && (
+              <div className="bg-yellow-500/10 border-b border-yellow-500/20 px-4 py-2 text-sm text-yellow-700 dark:text-yellow-400 flex items-center justify-center gap-2">
+                <span className="font-semibold">Demo Mode:</span>
+                <span>Create a project to enable messaging.</span>
+              </div>
+            )}
             <div className="flex-1 overflow-hidden">
               <ChatWindow
                 conversation={selectedConversation}

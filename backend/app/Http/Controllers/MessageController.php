@@ -16,7 +16,17 @@ class MessageController extends Controller
      */
     private function getConversation($projectId)
     {
-        $project = Project::findOrFail($projectId);
+        $project = Project::find($projectId);
+        
+        if (!$project) {
+            abort(404, 'Project not found');
+        }
+
+        // Verify user has access to this project
+        $userId = Auth::id();
+        if ($project->client_id !== $userId && $project->freelancer_id !== $userId) {
+            abort(403, 'You do not have access to this project');
+        }
 
         return Conversation::firstOrCreate([
             'project_id' => $project->id,
@@ -48,7 +58,7 @@ class MessageController extends Controller
     Auth::id(),
     'message_sent',
     'Message sent',
-    $request->message,
+    $data['message'],
     $conversation
 );
 
