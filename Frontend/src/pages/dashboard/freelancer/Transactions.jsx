@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { subDays } from 'date-fns';
 import { parseISO } from 'date-fns';
 import { filterTransactionsByPeriod } from '@/data/mockEarningsData';
@@ -7,9 +7,8 @@ import { TransactionFilters } from '@/components/transactions/TransactionFilters
 import { TransactionTable } from '@/components/transactions/TransactionTable';
 import { TransactionDetailsModal } from '@/components/transactions/TransactionDetailsModal';
 import { toast } from 'sonner';
-import { transactionsAPI, paymentsAPI, withdrawalsAPI } from '@/services/api';
 
-// Fallback mock data
+// Mock data - Replace with API calls
 const mockEarnings = [
   {
     id: '1',
@@ -102,63 +101,15 @@ const Transactions = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [timeFilter, setTimeFilter] = useState('all');
   const [selectedTransaction, setSelectedTransaction] = useState(null);
-  const [transactions, setTransactions] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    loadTransactions()
-  }, [])
-
-  const loadTransactions = async () => {
-    try {
-      setLoading(true)
-      const [transactionsResponse, paymentsResponse, withdrawalsResponse] = await Promise.all([
-        transactionsAPI.getAll(),
-        paymentsAPI.getFreelancerPayments(),
-        withdrawalsAPI.getHistory(),
-      ])
-      
-      // Combine all transaction types
-      const allTransactions = [
-        ...(paymentsResponse.data.data || paymentsResponse.data || []).map(p => ({
-          ...p,
-          type: 'earning',
-          amount: parseFloat(p.amount || 0),
-        })),
-        ...(withdrawalsResponse.data.data || withdrawalsResponse.data || []).map(w => ({
-          ...w,
-          type: 'withdrawal',
-          amount: -parseFloat(w.amount || 0),
-        })),
-      ]
-      
-      setTransactions(allTransactions)
-    } catch (error) {
-      console.error('Error loading transactions:', error)
-      toast.error('Failed to load transactions')
-      // Fallback to mock data
-      setTransactions([...mockEarnings, ...mockWithdrawals])
-    } finally {
-      setLoading(false)
-    }
-  }
 
   // Combine earnings and withdrawals
   const allTransactions = useMemo(() => {
-    if (transactions.length > 0) {
-      return transactions.sort((a, b) => {
-        const dateA = new Date(a.date || a.created_at || a.createdAt);
-        const dateB = new Date(b.date || b.created_at || b.createdAt);
-        return dateB - dateA; // Sort by newest first
-      });
-    }
-    // Fallback to mock data
     return [...mockEarnings, ...mockWithdrawals].sort((a, b) => {
       const dateA = new Date(a.date || a.createdAt);
       const dateB = new Date(b.date || b.createdAt);
       return dateB - dateA; // Sort by newest first
     });
-  }, [transactions]);
+  }, []);
 
   // Filter transactions
   const filteredTransactions = useMemo(() => {

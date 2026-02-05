@@ -9,7 +9,6 @@ import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import { useNavigate, Link } from "react-router-dom"
 import { toast } from "sonner"
-import { jobsAPI } from "@/services/api"
 
 const PostJob = () => {
   const navigate = useNavigate()
@@ -20,36 +19,11 @@ const PostJob = () => {
   const [duration, setDuration] = useState("")
   const [category, setCategory] = useState("")
   const [experienceLevel, setExperienceLevel] = useState("Intermediate")
-  const [loading, setLoading] = useState(false)
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = e => {
     e.preventDefault()
-    setLoading(true)
-    
-    try {
-      const skillsArray = skills
-        .split(",")
-        .map(s => s.trim())
-        .filter(Boolean)
-      
-      await jobsAPI.create({
-        title,
-        description,
-        skills: skillsArray,
-        budget,
-        duration,
-        category,
-        experience_level: experienceLevel,
-      })
-      
-      toast.success("Job posted! You can now invite freelancers.")
-      navigate("/invitations")
-    } catch (error) {
-      console.error('Error posting job:', error)
-      toast.error(error.response?.data?.message || 'Failed to post job')
-    } finally {
-      setLoading(false)
-    }
+    toast.success("Job posted! You can now invite freelancers.")
+    navigate("/invitations")
   }
 
   const computedSkills = skills
@@ -108,15 +82,9 @@ const PostJob = () => {
               </div>
             </div>
             <div className="flex gap-3">
-              <Button 
-                type="submit" 
-                className="bg-gradient-primary transition-all duration-300 hover:scale-105"
-                disabled={loading}
-              >
-                {loading ? 'Posting...' : 'Post Job'}
-              </Button>
+              <Button type="submit" className="bg-gradient-primary transition-all duration-300 hover:scale-105">Post Job</Button>
               <Link to="/jobs">
-                <Button type="button" variant="outline" className="transition-all duration-300 hover:scale-105" disabled={loading}>Cancel</Button>
+                <Button type="button" variant="outline" className="transition-all duration-300 hover:scale-105">Cancel</Button>
               </Link>
             </div>
           </form>

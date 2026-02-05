@@ -1,13 +1,4 @@
 import {
-  Briefcase,
-  Clock,
-  MessageSquare,
-  DollarSign,
-  CheckCircle,
-  AlertCircle,
-  TrendingUp,
-} from "lucide-react"
-import {
   PieChart,
   Pie,
   Cell,
@@ -19,34 +10,34 @@ import {
   ResponsiveContainer,
   Tooltip,
   Legend,
+  BarChart,
+  Bar,
 } from "recharts"
-import StatCard from "@/components/client/StatCard"
 import PageHeader from "@/components/client/PageHeader"
-import { useUser } from "@/contexts/UserContext.jsx"
-
-const MOCK_STATS = [
-  { icon: Briefcase, label: "Active Projects", value: "8", change: "+2" },
-  { icon: Clock, label: "Pending Actions", value: "5", change: "+1" },
-  { icon: MessageSquare, label: "Unread Messages", value: "12", change: "+3" },
-  { icon: DollarSign, label: "Total Spent", value: "$45,200", change: "+$2,500" },
-  { icon: CheckCircle, label: "Completed", value: "24", change: "+3" },
-  { icon: AlertCircle, label: "In Review", value: "6", change: "-1", changeType: "negative" },
-]
 
 const PIE_DATA = [
   { name: "Completed", value: 24, fill: "#22c55e" },
-  { name: "Active", value: 8, fill: "#15803d" },
+  { name: "Active", value: 8, fill: "#16a34a" },
   { name: "In Review", value: 6, fill: "#f97316" },
   { name: "On Hold", value: 2, fill: "#ef4444" },
 ]
 
-const SPENDING_DATA = [
-  { month: "Jan", amount: 4500 },
-  { month: "Feb", amount: 5200 },
-  { month: "Mar", amount: 4800 },
-  { month: "Apr", amount: 6100 },
-  { month: "May", amount: 5500 },
-  { month: "Jun", amount: 7200 },
+const SPENDING_TREND = [
+  { month: "Jul", amount: 4200 },
+  { month: "Aug", amount: 5100 },
+  { month: "Sep", amount: 4800 },
+  { month: "Oct", amount: 6200 },
+  { month: "Nov", amount: 5500 },
+  { month: "Dec", amount: 7200 },
+]
+
+const MONTHLY_ACTIVITY = [
+  { month: "Jul", projects: 3, invoices: 4 },
+  { month: "Aug", projects: 4, invoices: 5 },
+  { month: "Sep", projects: 2, invoices: 3 },
+  { month: "Oct", projects: 5, invoices: 6 },
+  { month: "Nov", projects: 4, invoices: 5 },
+  { month: "Dec", projects: 6, invoices: 7 },
 ]
 
 const PieTooltip = ({ active, payload }) => {
@@ -76,34 +67,32 @@ const SpendingTooltip = ({ active, payload, label }) => {
   )
 }
 
-const ClientDashboard = () => {
-  const { user } = useUser()
-  const name = user?.name || "Client"
+const ActivityTooltip = ({ active, payload, label }) => {
+  if (!active || !payload?.length) return null
+  return (
+    <div className="rounded-lg border border-green-200 bg-white px-3 py-2 shadow-md">
+      <p className="font-medium text-gray-900">{label}</p>
+      <p className="text-sm text-gray-600">
+        {payload
+          .map((p) => `${p.name}: ${p.value}`)
+          .join(" • ")}
+      </p>
+    </div>
+  )
+}
 
+const Analytics = () => {
   return (
     <div className="space-y-8">
       <PageHeader
-        title={`Welcome back, ${name}`}
-        description="Overview of your projects, activity, and spending on FreelanceHub."
+        title="Analytics"
+        description="Track spending, project health, and monthly activity across your workspace."
       />
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-        {MOCK_STATS.map((stat, i) => (
-          <StatCard
-            key={i}
-            icon={stat.icon}
-            label={stat.label}
-            value={stat.value}
-            change={stat.change}
-            changeType={stat.changeType}
-          />
-        ))}
-      </div>
 
       <div className="grid lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-lg border border-green-200 p-6 shadow-sm">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Project Status
+            Project status breakdown
           </h3>
           <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
@@ -134,11 +123,11 @@ const ClientDashboard = () => {
 
         <div className="bg-white rounded-lg border border-green-200 p-6 shadow-sm">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Spending Trend
+            Spending trend
           </h3>
           <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={SPENDING_DATA}>
+              <LineChart data={SPENDING_TREND}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                 <XAxis dataKey="month" stroke="#6b7280" />
                 <YAxis
@@ -160,8 +149,37 @@ const ClientDashboard = () => {
           </div>
         </div>
       </div>
+
+      <div className="bg-white rounded-lg border border-green-200 p-6 shadow-sm">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+          Monthly activity
+        </h3>
+        <div className="h-[300px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={MONTHLY_ACTIVITY}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+              <XAxis dataKey="month" stroke="#6b7280" />
+              <YAxis stroke="#6b7280" allowDecimals={false} />
+              <Tooltip content={<ActivityTooltip />} />
+              <Legend />
+              <Bar
+                dataKey="projects"
+                name="Projects created"
+                fill="#16a34a"
+                radius={[4, 4, 0, 0]}
+              />
+              <Bar
+                dataKey="invoices"
+                name="Invoices paid"
+                fill="#22c55e"
+                radius={[4, 4, 0, 0]}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
     </div>
   )
 }
 
-export default ClientDashboard
+export default Analytics

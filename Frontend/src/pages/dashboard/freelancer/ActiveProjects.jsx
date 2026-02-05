@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react"
+import { useState, useMemo } from "react"
 import { Briefcase, DollarSign, Clock, AlertTriangle } from "lucide-react"
 import {
   mockProjects,
@@ -15,49 +15,9 @@ import { ProjectCard } from "@/components/active-projects/ProjectCard"
 import { Sidebar } from "@/components/active-projects/Sidebar"
 import { ProjectModal } from "@/components/active-projects/ProjectModal"
 import { useToast } from "@/hooks/use-toast"
-import { projectsAPI } from "@/services/api"
-import { toast } from "sonner"
 
 export default function ActiveProjects() {
-  const [projects, setProjects] = useState([])
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    loadProjects()
-  }, [])
-
-  const loadProjects = async () => {
-    try {
-      setLoading(true)
-      const response = await projectsAPI.getFreelancerProjects()
-      const projectsData = response.data.data || response.data || []
-      
-      // Transform API data to match component structure
-      const transformedProjects = projectsData.map(project => ({
-        id: project.id,
-        title: project.job?.title || project.title || 'Untitled Project',
-        client: {
-          name: project.client?.name || project.job?.client?.name || 'Client',
-          avatar: project.client?.avatar || '',
-        },
-        status: project.status || 'active',
-        priority: project.priority || 'medium',
-        budget: parseFloat(project.budget || project.job?.budget || 0),
-        paid: parseFloat(project.paid || 0),
-        deadline: project.deadline || project.job?.deadline || new Date().toISOString(),
-        progress: project.progress || 0,
-      }))
-      
-      setProjects(transformedProjects)
-    } catch (error) {
-      console.error('Error loading projects:', error)
-      toast.error('Failed to load projects')
-      // Fallback to mock data
-      setProjects(mockProjects)
-    } finally {
-      setLoading(false)
-    }
-  }
+  const [projects] = useState(mockProjects)
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
   const [priorityFilter, setPriorityFilter] = useState("all")

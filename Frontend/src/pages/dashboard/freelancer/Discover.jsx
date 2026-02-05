@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { jobsAPI } from '@/services/api'
-import { toast } from 'sonner'
 import {
   Search,
   Filter,
@@ -75,45 +73,10 @@ const Discover = () => {
 
   const loadJobs = async () => {
     setLoading(true)
-    try {
-      const response = await jobsAPI.getAll()
-      const jobsData = response.data.data || response.data || []
-      
-      // Transform API data to match component structure
-      const transformedJobs = jobsData.map(job => ({
-        id: job.id,
-        title: job.title,
-        client: {
-          name: job.client?.name || 'Client',
-          avatar: job.client?.avatar || '',
-          rating: job.client?.rating || 0,
-          verified: job.client?.verified || false
-        },
-        budget: {
-          min: parseFloat(job.budget_min || job.budget?.split('-')[0]?.replace(/[^0-9]/g, '') || 0),
-          max: parseFloat(job.budget_max || job.budget?.split('-')[1]?.replace(/[^0-9]/g, '') || 0),
-          type: job.budget_type || 'fixed'
-        },
-        skills: Array.isArray(job.skills) ? job.skills : (job.skills_required || []),
-        description: job.description || '',
-        duration: job.duration || 'N/A',
-        experience: job.experience_level || 'Mid',
-        location: job.location || 'Remote',
-        posted: job.created_at ? new Date(job.created_at).toLocaleDateString() : 'Recently',
-        proposals: job.proposals_count || 0,
-        proposalsMax: 25,
-        views: job.views || 0,
-        matchScore: 85 // Calculate based on skills match
-      }))
-      
-      setJobs(transformedJobs)
-      setFilteredJobs(transformedJobs)
-    } catch (error) {
-      console.error('Error loading jobs:', error)
-      toast.error('Failed to load jobs')
-      
-      // Fallback to sample data
-      const sampleJobs = [
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000))
+
+    const sampleJobs = [
       {
         id: 1,
         title: 'Senior React Developer for E-commerce Dashboard',
@@ -176,11 +139,9 @@ const Discover = () => {
       }
     ]
 
-      setJobs(sampleJobs)
-      setFilteredJobs(sampleJobs)
-    } finally {
-      setLoading(false)
-    }
+    setJobs(sampleJobs)
+    setFilteredJobs(sampleJobs)
+    setLoading(false)
   }
 
   // Filter jobs

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useParams, Link } from "react-router-dom"
 import Navbar from "@/components/Navbar"
 import Footer from "@/components/Footer"
@@ -18,57 +18,23 @@ import {
   ArrowLeft
 } from "lucide-react"
 import { toast } from "sonner"
-import { jobsAPI, proposalsAPI } from "@/services/api"
+import jobsData from "@/data/jobs.json"
+import bidsData from "@/data/bids.json"
 
 const JobDetail = () => {
   const { id } = useParams()
-  const [job, setJob] = useState(null)
-  const [jobBids, setJobBids] = useState([])
-  const [loading, setLoading] = useState(true)
+  const job = jobsData.find(j => j.id === id)
+  const jobBids = bidsData
+    .filter(bid => bid.jobId === id)
+    .map(bid => ({
+      ...bid,
+      status: bid.status
+    }))
+
   const [showBidForm, setShowBidForm] = useState(false)
   const [bidAmount, setBidAmount] = useState("")
   const [bidDuration, setBidDuration] = useState("")
   const [coverLetter, setCoverLetter] = useState("")
-  const [submitting, setSubmitting] = useState(false)
-
-  useEffect(() => {
-    loadJobDetails()
-    loadProposals()
-  }, [id])
-
-  const loadJobDetails = async () => {
-    try {
-      setLoading(true)
-      const response = await jobsAPI.getById(id)
-      setJob(response.data.data || response.data)
-    } catch (error) {
-      console.error('Error loading job:', error)
-      toast.error('Failed to load job details')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const loadProposals = async () => {
-    try {
-      const response = await proposalsAPI.listForJob(id)
-      setJobBids(response.data.data || response.data || [])
-    } catch (error) {
-      console.error('Error loading proposals:', error)
-    }
-  }
-
-  if (loading) {
-    return (
-      <div className="min-h-screen">
-        <Navbar />
-        <div className="container mx-auto px-4 py-20 text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading job details...</p>
-        </div>
-      </div>
-    )
-  }
 
   if (!job) {
     return (
@@ -84,29 +50,13 @@ const JobDetail = () => {
     )
   }
 
-  const handleSubmitBid = async (e) => {
+  const handleSubmitBid = e => {
     e.preventDefault()
-    setSubmitting(true)
-    
-    try {
-      await jobsAPI.apply(id, {
-        amount: parseFloat(bidAmount),
-        duration: bidDuration,
-        cover_letter: coverLetter,
-      })
-      
-      toast.success("Your proposal has been submitted!")
-      setShowBidForm(false)
-      setBidAmount("")
-      setBidDuration("")
-      setCoverLetter("")
-      loadProposals() // Reload proposals
-    } catch (error) {
-      console.error('Error submitting proposal:', error)
-      toast.error(error.response?.data?.message || 'Failed to submit proposal')
-    } finally {
-      setSubmitting(false)
-    }
+    toast.success("Your proposal has been submitted!")
+    setShowBidForm(false)
+    setBidAmount("")
+    setBidDuration("")
+    setCoverLetter("")
   }
 
   return (
@@ -132,11 +82,11 @@ const JobDetail = () => {
                   <div className="flex items-center gap-4 text-sm text-muted-foreground">
                     <span className="flex items-center gap-1">
                       <Clock className="w-4 h-4" />
-                      Posted {job.created_at ? new Date(job.created_at).toLocaleDateString() : 'Recently'}
+                      Posted {new Date(job.postedDate).toLocaleDateString()}
                     </span>
                     <span className="flex items-center gap-1">
                       <FileText className="w-4 h-4" />
-                      {jobBids.length} proposals
+                      {job.proposals} proposals
                     </span>
                   </div>
                 </div>
@@ -144,9 +94,9 @@ const JobDetail = () => {
               </div>
 
               <div className="flex flex-wrap gap-2 mb-6">
-                {(job.skills || job.skills_required || []).map((skill, index) => (
-                  <Badge key={index} variant="outline">
-                    {typeof skill === 'string' ? skill : skill.name || skill}
+                {job.skillsRequired.map(skill => (
+                  <Badge key={skill} variant="outline">
+                    {skill}
                   </Badge>
                 ))}
               </div>
@@ -215,16 +165,14 @@ const JobDetail = () => {
                     <Button
                       type="submit"
                       className="flex-1 bg-gradient-primary hover:opacity-90"
-                      disabled={submitting}
                     >
-                      {submitting ? 'Submitting...' : 'Submit Proposal'}
+                      Submit Proposal
                     </Button>
                     <Button
                       type="button"
                       variant="outline"
                       onClick={() => setShowBidForm(false)}
                       className="flex-1"
-                      disabled={submitting}
                     >
                       Cancel
                     </Button>
@@ -258,20 +206,20 @@ const JobDetail = () => {
                     <DollarSign className="w-4 h-4" />
                     <span className="text-sm">Budget</span>
                   </div>
-                  <p className="font-semibold">{job.budget || '$' + (job.budget_min || 0) + ' - $' + (job.budget_max || 0)}</p>
+                  <p className="font-semibold">{job.budget}</p>
                 </div>
                 <div>
                   <div className="flex items-center gap-2 text-muted-foreground mb-1">
                     <Clock className="w-4 h-4" />
                     <span className="text-sm">Duration</span>
                   </div>
-                  <p className="font-semibold">{job.duration || 'N/A'}</p>
+                  <p className="font-semibold">{job.duration}</p>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">
                     Experience Level
                   </p>
-                  <Badge variant="outline">{job.experience_level || job.experienceLevel || 'N/A'}</Badge>
+                  <Badge variant="outline">{job.experienceLevel}</Badge>
                 </div>
               </div>
             </Card>
@@ -284,29 +232,25 @@ const JobDetail = () => {
                 </div>
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <p className="font-semibold">{job.client?.name || 'Client'}</p>
-                    {job.client?.verified && (
+                    <p className="font-semibold">{job.client.name}</p>
+                    {job.client.verified && (
                       <CheckCircle className="w-4 h-4 text-accent" />
                     )}
                   </div>
-                  {job.client?.rating && (
-                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                      <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                      <span>{job.client.rating}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-              {job.client?.total_jobs !== undefined && (
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">
-                      Total Jobs Posted
-                    </span>
-                    <span className="font-medium">{job.client.total_jobs || job.client.totalJobs || 0}</span>
+                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                    <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                    <span>{job.client.rating}</span>
                   </div>
                 </div>
-              )}
+              </div>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">
+                    Total Jobs Posted
+                  </span>
+                  <span className="font-medium">{job.client.totalJobs}</span>
+                </div>
+              </div>
             </Card>
           </div>
         </div>

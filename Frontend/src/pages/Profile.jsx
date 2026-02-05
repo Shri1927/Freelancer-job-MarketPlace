@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Card } from "@/components/ui/card";
@@ -9,50 +9,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Star, MapPin, Briefcase, Calendar, Edit2, Save } from "lucide-react";
 import { toast } from "sonner";
-import { freelancerProfileAPI } from "@/services/api";
-import { useAuthStore } from "@/store/auth";
+import usersData from "@/data/users.json";
 
 const Profile = () => {
-  const { user } = useAuthStore();
   const [isEditing, setIsEditing] = useState(false);
-  const [userData, setUserData] = useState({
-    name: user?.name || '',
-    role: user?.role || '',
-    bio: '',
-    location: '',
-    rating: 0,
-    completedProjects: 0,
-    joinedDate: new Date().toISOString()
-  });
-  const [loading, setLoading] = useState(false);
+  const [userData, setUserData] = useState(usersData[0]);
 
-  useEffect(() => {
-    // Load profile data if available
-    if (user) {
-      setUserData(prev => ({
-        ...prev,
-        name: user.name || prev.name,
-        role: user.role || prev.role,
-      }));
-    }
-  }, [user]);
-
-  const handleSave = async () => {
-    setLoading(true);
-    try {
-      await freelancerProfileAPI.update({
-        name: userData.name,
-        bio: userData.bio,
-        location: userData.location,
-      });
-      toast.success("Profile updated successfully!");
-      setIsEditing(false);
-    } catch (error) {
-      console.error('Error updating profile:', error);
-      toast.error(error.response?.data?.message || 'Failed to update profile');
-    } finally {
-      setLoading(false);
-    }
+  const handleSave = () => {
+    toast.success("Profile updated successfully!");
+    setIsEditing(false);
   };
 
   return (
@@ -111,12 +76,11 @@ const Profile = () => {
               <Button
                 onClick={() => isEditing ? handleSave() : setIsEditing(true)}
                 className="bg-gradient-primary hover:opacity-90"
-                disabled={loading}
               >
                 {isEditing ? (
                   <>
                     <Save className="w-4 h-4 mr-2" />
-                    {loading ? 'Saving...' : 'Save Changes'}
+                    Save Changes
                   </>
                 ) : (
                   <>

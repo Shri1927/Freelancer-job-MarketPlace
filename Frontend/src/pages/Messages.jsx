@@ -1,54 +1,21 @@
-import { useState, useEffect } from "react"
-import { useParams } from "react-router-dom"
+import { useState } from "react"
 import Navbar from "@/components/Navbar"
 import Footer from "@/components/Footer"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { messagesAPI } from "@/services/api"
-import { toast } from "sonner"
-import { useAuthStore } from "@/store/auth"
 
 const Messages = () => {
-  const { projectId } = useParams()
-  const { user } = useAuthStore()
-  const [messages, setMessages] = useState([])
+  const [messages, setMessages] = useState([
+    { id: 1, from: "Client", text: "Hi, thanks for your proposal. Can we discuss timeline?" },
+    { id: 2, from: "Freelancer", text: "Sure! I can deliver first milestone in 2 weeks." }
+  ])
   const [input, setInput] = useState("")
-  const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    if (projectId) {
-      loadMessages()
-    }
-  }, [projectId])
-
-  const loadMessages = async () => {
-    try {
-      setLoading(true)
-      const response = await messagesAPI.getByProject(projectId)
-      setMessages(response.data.data || response.data || [])
-    } catch (error) {
-      console.error('Error loading messages:', error)
-      toast.error('Failed to load messages')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const send = async () => {
-    if (!input.trim() || !projectId) return
-    
-    try {
-      await messagesAPI.send({
-        project_id: projectId,
-        message: input.trim(),
-      })
-      setInput("")
-      loadMessages() // Reload messages
-    } catch (error) {
-      console.error('Error sending message:', error)
-      toast.error('Failed to send message')
-    }
+  const send = () => {
+    if (!input.trim()) return
+    setMessages(prev => [...prev, { id: Date.now(), from: "You", text: input.trim() }])
+    setInput("")
   }
 
   return (

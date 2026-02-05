@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { DollarSign, Bell, Search, Settings, Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -9,36 +9,9 @@ import ClientBreakdown from "@/components/earnings/ClientBreakdown"
 import PaymentTracking from "@/components/earnings/PaymentTracking"
 import QuickStats from "@/components/earnings/QuickStats"
 import EarningsActions from "@/components/earnings/EarningsActions"
-import { paymentsAPI } from "@/services/api"
-import { toast } from "sonner"
 
 const Earnings = () => {
-  const [earningsData, setEarningsData] = useState(null)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    loadEarnings()
-  }, [])
-
-  const loadEarnings = async () => {
-    try {
-      setLoading(true)
-      const [earningsResponse, totalResponse] = await Promise.all([
-        paymentsAPI.getEarnings(),
-        paymentsAPI.getTotalEarnings(),
-      ])
-      
-      setEarningsData({
-        earnings: earningsResponse.data.data || earningsResponse.data || [],
-        total: totalResponse.data.total || totalResponse.data || 0,
-      })
-    } catch (error) {
-      console.error('Error loading earnings:', error)
-      toast.error('Failed to load earnings data')
-    } finally {
-      setLoading(false)
-    }
-  }
+  
 
   return (
     <div className="min-h-screen bg-background">

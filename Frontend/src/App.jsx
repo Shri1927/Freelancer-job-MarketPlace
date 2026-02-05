@@ -18,7 +18,7 @@ import CreateContract from "./pages/CreateContract.jsx"
 import Workroom from "./pages/Workroom.jsx"
 import Feedback from "./pages/Feedback.jsx"
 import Contracts from "./pages/Contracts.jsx"
-import { useAuthStore } from './store/auth.js'
+import { useAuthStore } from '../src/store/auth.js'
 import OnboardingQuestionnaire from '../src/pages/create_profile/OnboardingQuestionnaire.jsx'
 import ProfileSetup from '../src/pages/create_profile/ProfileSetup.jsx'
 import RoleSelector from '../src/pages/create_profile/RoleSelector.jsx'
@@ -31,6 +31,17 @@ import JobDetails from "./pages/dashboard/freelancer/JobDetails.jsx"
 import QuickApply from "./pages/dashboard/freelancer/QuickApply.jsx"
 import Discover from "./pages/dashboard/freelancer/Discover.jsx"
 import MilestonesTasks from "./pages/dashboard/freelancer/MilestonesPage.jsx"
+import ClientLayout from "./pages/dashboard/client/ClientLayout.jsx"
+import ClientDashboard from "./pages/dashboard/client/ClientDashboard.jsx"
+import ClientProjects from "./pages/dashboard/client/Projects.jsx"
+import ClientBilling from "./pages/dashboard/client/Billing.jsx"
+import ClientInvoices from "./pages/dashboard/client/Invoices.jsx"
+import ClientProfilePage from "./pages/dashboard/client/Profile.jsx"
+import ClientReports from "./pages/dashboard/client/Reports.jsx"
+import ClientAnalytics from "./pages/dashboard/client/Analytics.jsx"
+import ClientActivityLog from "./pages/dashboard/client/ActivityLog.jsx"
+import ClientSettings from "./pages/dashboard/client/Settings.jsx"
+import ClientProjectDetails from "./pages/dashboard/client/ProjectDetails.jsx"
 
 const queryClient = new QueryClient()
 
@@ -55,6 +66,18 @@ const App = () => (
           <Route path="/contracts" element={<Contracts />} />
           <Route path="/dashboard" element={<DashboardRouter />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/dashboard/client" element={<ClientLayout />}>
+            <Route index element={<ClientDashboard />} />
+            <Route path="projects" element={<ClientProjects />} />
+            <Route path="projects/:id" element={<ClientProjectDetails />} />
+            <Route path="billing" element={<ClientBilling />} />
+            <Route path="invoices" element={<ClientInvoices />} />
+            <Route path="reports" element={<ClientReports />} />
+            <Route path="analytics" element={<ClientAnalytics />} />
+            <Route path="activity" element={<ClientActivityLog />} />
+            <Route path="profile" element={<ClientProfilePage />} />
+            <Route path="settings" element={<ClientSettings />} />
+          </Route>
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
           <Route path="/questions" element={<OnboardingQuestionnaire />} />
