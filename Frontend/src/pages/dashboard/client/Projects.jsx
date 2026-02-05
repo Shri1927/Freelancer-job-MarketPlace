@@ -1,79 +1,26 @@
 import { useEffect, useMemo, useState } from "react"
+import { useNavigate } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
-import ProjectCard from "@/components/client/ProjectCard"
 import PageHeader from "@/components/client/PageHeader"
 import EmptyState from "@/components/client/EmptyState"
+import StatusBadge from "@/components/client/StatusBadge"
 import { cn } from "@/lib/utils"
 
-const MOCK_PROJECTS = [
-  {
-    id: "1",
-    name: "E-commerce Website Redesign",
-    description:
-      "Full redesign of the e-commerce platform with modern UI, improved checkout flow, and mobile responsiveness.",
-    status: "active",
-    deadline: "Dec 15, 2024",
-    progress: 72,
-  },
-  {
-    id: "2",
-    name: "Mobile App Development",
-    description:
-      "Native iOS and Android app for the fitness product. Integration with wearables and cloud sync.",
-    status: "in-review",
-    deadline: "Jan 20, 2025",
-    progress: 58,
-  },
-  {
-    id: "3",
-    name: "Logo & Brand Identity",
-    description:
-      "Complete brand identity including logo, color palette, typography, and brand guidelines.",
-    status: "completed",
-    deadline: "Nov 1, 2024",
-    progress: 100,
-  },
-  {
-    id: "4",
-    name: "API Integration Project",
-    description:
-      "Integration of third-party payment and shipping APIs into the existing backend with full documentation.",
-    status: "active",
-    deadline: "Dec 28, 2024",
-    progress: 40,
-  },
-  {
-    id: "5",
-    name: "Content Marketing Strategy",
-    description:
-      "Six-month content strategy, including blog calendar, social media plan, and SEO recommendations.",
-    status: "on-hold",
-    deadline: "Jan 10, 2025",
-    progress: 20,
-  },
-  {
-    id: "6",
-    name: "Data Analytics Dashboard",
-    description:
-      "Internal analytics dashboard with real-time KPIs, charts, and export functionality for leadership.",
-    status: "completed",
-    deadline: "Oct 15, 2024",
-    progress: 100,
-  },
-]
+const JOBS_STORAGE_KEY = "client_jobs"
 
 const FILTERS = [
   { label: "All", value: "all" },
-  { label: "Active", value: "active" },
-  { label: "In Review", value: "in-review" },
+  { label: "Open", value: "open" },
+  { label: "In Progress", value: "in-progress" },
   { label: "Completed", value: "completed" },
-  { label: "On Hold", value: "on-hold" },
 ]
 
 const Projects = () => {
+  const navigate = useNavigate()
   const [filter, setFilter] = useState("all")
   const [isLoading, setIsLoading] = useState(true)
+  const [jobs, setJobs] = useState([])
 
   useEffect(() => {
     // Simulate initial loading state for nicer UX
@@ -81,10 +28,36 @@ const Projects = () => {
     return () => clearTimeout(timer)
   }, [])
 
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(JOBS_STORAGE_KEY)
+      if (!stored) {
+        setJobs([])
+        return
+      }
+      const parsed = JSON.parse(stored)
+      if (Array.isArray(parsed)) {
+        setJobs(parsed)
+      } else {
+        setJobs([])
+      }
+    } catch (error) {
+      console.error("Failed to load client jobs from localStorage", error)
+      setJobs([])
+    }
+  }, [])
+
   const filtered = useMemo(() => {
-    if (filter === "all") return MOCK_PROJECTS
-    return MOCK_PROJECTS.filter((p) => p.status === filter)
-  }, [filter])
+    if (filter === "all") return jobs
+
+    return jobs.filter((job) => {
+      const status = (job.status || "").toString().toLowerCase()
+      if (filter === "open") return status === "open"
+      if (filter === "in-progress") return status === "in progress" || status === "in-progress"
+      if (filter === "completed") return status === "completed"
+      return true
+    })
+  }, [jobs, filter])
 
   return (
     <div className="space-y-6">
@@ -123,6 +96,19 @@ const Projects = () => {
             </div>
           ))}
         </div>
+      ) : jobs.length === 0 ? (
+        <EmptyState
+          title="No projects yet"
+          description="Post your first job to start working with top freelancers on FreelanceHub."
+          action={
+            <Button
+              className="bg-green-600 hover:bg-green-700 text-white"
+              onClick={() => navigate("/dashboard/client/post-job")}
+            >
+              Post your first job
+            </Button>
+          }
+        />
       ) : filtered.length === 0 ? (
         <EmptyState
           title="No projects match this filter"
@@ -130,9 +116,55 @@ const Projects = () => {
         />
       ) : (
         <div className="space-y-4">
-          {filtered.map((project) => (
-            <ProjectCard key={project.id} project={project} />
-          ))}
+          {filtered.map((job) => {
+            const createdDate = job.createdAt
+              ? new Date(job.createdAt)
+              : null
+            const formattedDate = createdDate
+              ? createdDate.toLocaleDateString()
+              : "—"
+
+            return (
+              <div
+                key={job.id}
+                className="bg-white rounded-lg border border-green-200 p-5 hover:shadow-md transition-all"
+              >
+                <div className="flex items-start justify-between gap-4 mb-3">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-1 truncate">
+                      {job.title}
+                    </h3>
+                    <p className="text-sm text-gray-600 line-clamp-2">
+                      {job.description}
+                    </p>
+                  </div>
+                  <div className="flex flex-col items-end gap-1">
+                    <StatusBadge status={job.status} type="project" />
+                    <span className="text-xs text-gray-500 whitespace-nowrap">
+                      {formattedDate !== "—"
+                        ? `Created ${formattedDate}`
+                        : "Creation date unavailable"}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="mt-3 flex flex-wrap items-center justify-between gap-3 text-sm text-gray-700">
+                  <div>
+                    <span className="font-medium text-gray-900">Budget: </span>
+                    <span>{job.budget || "Not specified"}</span>
+                  </div>
+                  {job.timeline && (
+                    <div className="text-gray-600">
+                      <span className="font-medium text-gray-900">
+                        Timeline:{" "}
+                      </span>
+                      <span>{job.timeline}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )
+          })}
         </div>
       )}
     </div>

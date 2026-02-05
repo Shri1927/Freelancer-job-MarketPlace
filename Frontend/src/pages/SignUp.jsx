@@ -56,8 +56,8 @@ export default function SignUp() {
     setLoading(true);
 
     try {
-      console.log('Starting signup process...');
-      console.log('Form data:', formData);
+      console.log('[SignUp] Starting signup process...');
+      console.log('[SignUp] Form data:', formData);
 
       const result = await signUp(
         formData.email,
@@ -66,36 +66,36 @@ export default function SignUp() {
         formData.role
       );
 
-      console.log('Signup result:', result);
+      console.log('[SignUp] Signup result:', result);
 
       if (result && result.success) {
-        console.log('Signup successful! Storing user and redirecting...');
+        console.log('[SignUp] Signup successful! Storing user and redirecting...');
         
-        // Store user data in localStorage
-        localStorage.setItem('userInfo', JSON.stringify({
+        const userPayload = {
           id: result.user.id,
           email: result.user.email,
           name: result.user.name,
           role: result.user.role,
           userType: result.user.role,
           avatar: result.user.avatar
-        }));
+        };
 
-        // Redirect to different pages based on role
-        if (formData.role === 'freelancer') {
-          navigate('/questions');
-        } else if (formData.role === 'client') {
-          navigate('/clientaccount');
-        } else {
-          navigate('/dashboard');
-        }
+        // Store user data in localStorage
+        localStorage.setItem('userInfo', JSON.stringify(userPayload));
+
+        const redirectTo = '/dashboard';
+        console.log('[SignUp] userType:', userPayload.userType);
+        console.log('[SignUp] Redirecting to', redirectTo);
+
+        // Let DashboardRouter decide the correct dashboard based on userType
+        navigate(redirectTo);
       } else {
         const errorMessage = result?.error || 'Failed to create account. Please try again.';
         setError(errorMessage);
-        console.error('Signup failed:', errorMessage);
+        console.error('[SignUp] Signup failed:', errorMessage);
       }
     } catch (err) {
-      console.error('Unexpected error during signup:', err);
+      console.error('[SignUp] Unexpected error during signup:', err);
       setError('An unexpected error occurred. Please try again.');
     } finally {
       setLoading(false);

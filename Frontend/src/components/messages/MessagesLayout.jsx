@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { ConversationList } from "./ConversationList"
 import { ChatWindow } from "./ChatWindow"
 import { CallsHistory } from "./CallsHistory"
@@ -11,10 +11,63 @@ import { Menu, X, Phone } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
+const CONVERSATIONS_STORAGE_KEY = "messages_conversations"
+
 export function MessagesLayout() {
-  const [conversations, setConversations] = useState(mockConversations)
+  const [conversations, setConversations] = useState(() => {
+    if (typeof window === "undefined") return mockConversations
+    try {
+      const stored = window.localStorage.getItem(CONVERSATIONS_STORAGE_KEY)
+      if (!stored) return mockConversations
+      const parsed = JSON.parse(stored)
+      if (!Array.isArray(parsed)) return mockConversations
+
+      return parsed.map((conv) => ({
+        ...conv,
+        lastMessageTime: conv.lastMessageTime
+          ? new Date(conv.lastMessageTime)
+          : new Date(),
+        messages: Array.isArray(conv.messages)
+          ? conv.messages.map((msg) => ({
+              ...msg,
+              timestamp: msg.timestamp ? new Date(msg.timestamp) : new Date(),
+            }))
+          : [],
+      }))
+    } catch (error) {
+      console.error("Failed to load conversations from localStorage", error)
+      return mockConversations
+    }
+  })
   const [selectedConversationId, setSelectedConversationId] = useState("1")
   const [mobileView, setMobileView] = useState("list")
+
+  useEffect(() => {
+    try {
+      const serializable = conversations.map((conv) => ({
+        ...conv,
+        lastMessageTime:
+          conv.lastMessageTime instanceof Date
+            ? conv.lastMessageTime.toISOString()
+            : conv.lastMessageTime,
+        messages: Array.isArray(conv.messages)
+          ? conv.messages.map((msg) => ({
+              ...msg,
+              timestamp:
+                msg.timestamp instanceof Date
+                  ? msg.timestamp.toISOString()
+                  : msg.timestamp,
+            }))
+          : [],
+      }))
+      window.localStorage.setItem(
+        CONVERSATIONS_STORAGE_KEY,
+        JSON.stringify(serializable)
+      )
+    } catch (error) {
+      console.error("Failed to save conversations to localStorage", error)
+    }
+  }, [conversations])
 
   const selectedConversation =
     conversations.find(c => c.id === selectedConversationId) || null

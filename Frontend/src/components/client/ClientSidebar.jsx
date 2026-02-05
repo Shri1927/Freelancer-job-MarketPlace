@@ -8,6 +8,8 @@ import {
   User,
   Settings,
   FileBarChart,
+  MessageSquare,
+  FilePlus2,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -22,6 +24,16 @@ const ClientSidebar = () => {
           icon: Briefcase,
           label: "Projects",
           path: "/dashboard/client/projects",
+        },
+        {
+          icon: FilePlus2,
+          label: "Post Job",
+          path: "/dashboard/client/post-job",
+        },
+        {
+          icon: MessageSquare,
+          label: "Messages",
+          path: "/dashboard/client/messages",
         },
       ],
     },

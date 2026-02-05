@@ -42,6 +42,8 @@ import ClientAnalytics from "./pages/dashboard/client/Analytics.jsx"
 import ClientActivityLog from "./pages/dashboard/client/ActivityLog.jsx"
 import ClientSettings from "./pages/dashboard/client/Settings.jsx"
 import ClientProjectDetails from "./pages/dashboard/client/ProjectDetails.jsx"
+import ClientPostJob from "./pages/dashboard/client/PostJob.jsx"
+import ClientMessages from "./pages/dashboard/client/Messages.jsx"
 
 const queryClient = new QueryClient()
 
@@ -54,6 +56,8 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/signin" element={<SignIn />} />
+          <Route path="/signin/client" element={<SignIn />} />
+          <Route path="/signin/freelancer" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/jobs" element={<Jobs />} />
           <Route path="/jobs/:id" element={<JobDetail />} />
@@ -66,10 +70,13 @@ const App = () => (
           <Route path="/contracts" element={<Contracts />} />
           <Route path="/dashboard" element={<DashboardRouter />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/dashboard/freelancer" element={<FreelancerDashboard />} />
           <Route path="/dashboard/client" element={<ClientLayout />}>
             <Route index element={<ClientDashboard />} />
             <Route path="projects" element={<ClientProjects />} />
             <Route path="projects/:id" element={<ClientProjectDetails />} />
+            <Route path="post-job" element={<ClientPostJob />} />
+            <Route path="messages" element={<ClientMessages />} />
             <Route path="billing" element={<ClientBilling />} />
             <Route path="invoices" element={<ClientInvoices />} />
             <Route path="reports" element={<ClientReports />} />

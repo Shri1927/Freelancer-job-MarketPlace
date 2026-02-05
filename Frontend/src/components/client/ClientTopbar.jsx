@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom"
-import { Search, Bell, User, Settings } from "lucide-react"
+import { Search, User, Settings } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { useUser } from "@/contexts/UserContext.jsx"
+import ClientNotificationsDropdown from "@/components/client/ClientNotificationsDropdown"
 
 const ClientTopbar = () => {
   const { user } = useUser()
@@ -37,10 +38,7 @@ const ClientTopbar = () => {
         </div>
 
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" className="relative">
-            <Bell className="w-5 h-5 text-gray-600" />
-            <span className="absolute top-1 right-1 w-2 h-2 bg-green-500 rounded-full" />
-          </Button>
+          <ClientNotificationsDropdown />
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

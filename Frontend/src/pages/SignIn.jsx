@@ -9,8 +9,17 @@ export default function SignIn() {
   const location = useLocation();
   const { signIn, signInWithGoogle, signInWithFacebook, setUser } = useAuthStore();
 
-  // Get role from state or default to 'freelancer'
-  const role = location.state?.role || 'freelancer';
+  // Determine role from path (/signin/client or /signin/freelancer) or state; default to 'freelancer'
+  const pathname = location.pathname || '';
+  const pathRole =
+    pathname.includes('/signin/client') ? 'client' :
+    pathname.includes('/signin/freelancer') ? 'freelancer' :
+    null;
+
+  const role = pathRole || location.state?.role || 'freelancer';
+
+  console.log('[SignIn] pathname:', pathname);
+  console.log('[SignIn] resolved role:', role);
 
   const [formData, setFormData] = useState({
     email: '',
@@ -75,22 +84,26 @@ export default function SignIn() {
       const result = await mockSignIn(formData.email, formData.password);
 
       if (result.success) {
-        // Store user data in localStorage
-        localStorage.setItem('userInfo', JSON.stringify({
+        const userPayload = {
           id: result.user.id,
           email: result.user.email,
           name: result.user.name,
           role: result.user.role,
           userType: result.user.role,
           avatar: result.user.avatar
-        }));
+        };
+
+        // Store user data in localStorage
+        localStorage.setItem('userInfo', JSON.stringify(userPayload));
         
         // Update auth store with user data
         if (setUser) {
-          setUser(result.user);
+          setUser(userPayload);
         }
         
-        console.log('Sign in successful, navigating to /dashboard');
+        console.log('[SignIn] Sign in successful');
+        console.log('[SignIn] userType:', userPayload.userType);
+        console.log('[SignIn] Redirecting to /dashboard');
         navigate('/dashboard');
       } else {
         setError(result.error || 'Invalid email or password');
@@ -120,21 +133,25 @@ export default function SignIn() {
       };
 
       // Store user data in localStorage
-      localStorage.setItem('userInfo', JSON.stringify({
+      const userPayload = {
         id: mockUser.id,
         email: mockUser.email,
         name: mockUser.name,
         role: mockUser.role,
         userType: mockUser.role,
         avatar: mockUser.avatar
-      }));
+      };
+
+      localStorage.setItem('userInfo', JSON.stringify(userPayload));
 
       // Update auth store
       if (setUser) {
-        setUser(mockUser);
+        setUser(userPayload);
       }
       
-      console.log('Google sign in successful, navigating to /dashboard');
+      console.log('[SignIn] Google sign in successful');
+      console.log('[SignIn] userType:', userPayload.userType);
+      console.log('[SignIn] Redirecting to /dashboard');
       navigate('/dashboard');
     } catch (err) {
       console.error('Google sign in error:', err);
@@ -161,21 +178,25 @@ export default function SignIn() {
       };
 
       // Store user data in localStorage
-      localStorage.setItem('userInfo', JSON.stringify({
+      const userPayload = {
         id: mockUser.id,
         email: mockUser.email,
         name: mockUser.name,
         role: mockUser.role,
         userType: mockUser.role,
         avatar: mockUser.avatar
-      }));
+      };
+
+      localStorage.setItem('userInfo', JSON.stringify(userPayload));
 
       // Update auth store
       if (setUser) {
-        setUser(mockUser);
+        setUser(userPayload);
       }
       
-      console.log('Facebook sign in successful, navigating to /dashboard');
+      console.log('[SignIn] Facebook sign in successful');
+      console.log('[SignIn] userType:', userPayload.userType);
+      console.log('[SignIn] Redirecting to /dashboard');
       navigate('/dashboard');
     } catch (err) {
       console.error('Facebook sign in error:', err);
