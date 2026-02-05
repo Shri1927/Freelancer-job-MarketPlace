@@ -18,6 +18,12 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\FreelancerDashboardController;
 use App\Http\Controllers\WithdrawalController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\ClientDashboardController;
+use App\Http\Controllers\ClientProjectController;
+use App\Http\Controllers\ClientBillingController;
+use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\ClientReportController;
+use App\Http\Controllers\ClientSettingsController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -63,12 +69,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Common
     Route::get('/projects/{id}', [ProjectController::class, 'show']);
 
-    // Client dashboard
-    Route::get('/client/dashboard', [DashboardController::class, 'clientDashboard']);
-    Route::get('/client/dashboard/project-status', [DashboardController::class, 'projectStatusChart']);
-    Route::get('/client/dashboard/spending-trend', [DashboardController::class, 'spendingTrend']);
-    Route::get('/client/dashboard/recent-projects', [DashboardController::class, 'recentProjects']);
-
+    
     //messages 
     Route::post('/messages/send', [MessageController::class, 'send']);
     Route::get('/messages/{projectId}', [MessageController::class, 'messages']);
@@ -103,4 +104,22 @@ Route::middleware('auth:sanctum')->group(function () {
     // Transactions
     Route::get('/freelancer/transactions', [TransactionController::class, 'index']);
     Route::get('/freelancer/transactions/summary', [TransactionController::class, 'summary']);
+
+
+    // Client dashboard
+    Route::get('/client/dashboard', [ClientDashboardController::class, 'index']);
+     Route::get('/client/projects', [ClientProjectController::class, 'index']);
+    Route::get('/client/projects/{id}', [ClientProjectController::class, 'show']);
+     Route::get('/client/billing/overview', [ClientBillingController::class, 'overview']);
+    Route::get('/client/payments', [ClientBillingController::class, 'payments']);
+    Route::get('/client/invoices', [InvoiceController::class, 'index']);
+    Route::get('/client/invoices/{id}', [InvoiceController::class, 'show']);
+    Route::get('/client/reports/summary', [ClientReportController::class, 'summary']);
+    Route::get('/client/reports/analytics', [ClientReportController::class, 'analytics']);
+    Route::get('/client/activity-log', [ActivityController::class, 'index']);
+
+    Route::get('/client/settings', [ClientSettingsController::class, 'show']);
+    Route::put('/client/profile', [ClientSettingsController::class, 'updateProfile']);
+    Route::put('/client/settings', [ClientSettingsController::class, 'updateSettings']);
+    Route::put('/client/password', [ClientSettingsController::class, 'updatePassword']);
 });

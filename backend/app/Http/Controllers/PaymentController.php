@@ -7,6 +7,8 @@ use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Helpers\ActivityLogger;
+use App\Models\Invoice;
+use Illuminate\Support\Str;
 
 class PaymentController extends Controller
 {
@@ -22,6 +24,7 @@ class PaymentController extends Controller
             'amount' => 'required|numeric|min:1'
         ]);
 
+        // 1️⃣ Create payment
         $payment = Payment::create([
             'project_id'     => $project->id,
             'client_id'      => Auth::id(),
@@ -33,7 +36,23 @@ class PaymentController extends Controller
             'transaction_id' => uniqid('txn_')
         ]);
 
-        // activity log
+        // 2️⃣ Create invoice immediately
+        $invoice = Invoice::create([
+            'invoice_number' => 'INV-' . strtoupper(Str::random(8)),
+            'project_id'     => $project->id,
+            'client_id'      => $project->client_id,
+            'freelancer_id'  => $project->freelancer_id,
+            'amount'         => $payment->amount,
+            'status'         => 'paid',
+            'invoice_date'   => now()
+        ]);
+
+        // 3️⃣ Update project status (recommended)
+        $project->update([
+            'status' => 'completed'
+        ]);
+
+        // 4️⃣ Activity log
         ActivityLogger::log(
             Auth::id(),
             'payment_made',
@@ -44,7 +63,8 @@ class PaymentController extends Controller
 
         return response()->json([
             'message' => 'Payment successful',
-            'payment' => $payment
+            'payment' => $payment,
+            'invoice' => $invoice
         ], 201);
     }
 
@@ -54,36 +74,36 @@ class PaymentController extends Controller
     public function clientPayments()
     {
         return response()->json(
-            Payment::where('client_id', Auth::id())
+            Payment::with('project')
+                ->where('client_id', Auth::id())
                 ->latest()
                 ->get()
         );
     }
 
-      public function earnings()
-    {
-        return Payment::where('freelancer_id', auth()->id())
-            ->where('status', 'paid')
-            ->latest()
-            ->get();
-    }
-     public function totalEarnings()
-    {
-        return Payment::where('freelancer_id', auth()->id())
-            ->where('status', 'paid')
-            ->sum('amount');
-    }
-
     /**
-     * FREELANCER → Earnings
+     * FREELANCER → All earnings
      */
     public function freelancerPayments()
     {
         return response()->json(
-            Payment::where('freelancer_id', Auth::id())
+            Payment::with('project')
+                ->where('freelancer_id', Auth::id())
                 ->where('status', 'paid')
                 ->latest()
                 ->get()
         );
+    }
+
+    /**
+     * FREELANCER → Total earnings
+     */
+    public function totalEarnings()
+    {
+        return response()->json([
+            'total' => Payment::where('freelancer_id', Auth::id())
+                ->where('status', 'paid')
+                ->sum('amount')
+        ]);
     }
 }
