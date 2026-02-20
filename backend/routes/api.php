@@ -24,6 +24,7 @@ use App\Http\Controllers\ClientBillingController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\ClientReportController;
 use App\Http\Controllers\ClientSettingsController;
+use App\Http\Controllers\ClientPaymentMethodController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -122,4 +123,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/client/profile', [ClientSettingsController::class, 'updateProfile']);
     Route::put('/client/settings', [ClientSettingsController::class, 'updateSettings']);
     Route::put('/client/password', [ClientSettingsController::class, 'updatePassword']);
+
+    // Client payment methods
+    Route::get('/client/payment-methods', [ClientPaymentMethodController::class, 'index']);
+    Route::post('/client/payment-methods', [ClientPaymentMethodController::class, 'store']);
 });

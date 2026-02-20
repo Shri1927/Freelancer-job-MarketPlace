@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { X } from "lucide-react";
+import { apiFetch } from "@/lib/apiClient";
 
 export default function AddPaymentMethodModal({ isOpen, onClose, onAdd }) {
   const [form, setForm] = useState({
@@ -17,7 +18,10 @@ export default function AddPaymentMethodModal({ isOpen, onClose, onAdd }) {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSave = () => {
+  const resetForm = () =>
+    setForm({ name: "", number: "", expiry: "", cvv: "", address: "" });
+
+  const handleSave = async () => {
     if (
       !form.name ||
       form.number.length < 12 ||
@@ -30,22 +34,32 @@ export default function AddPaymentMethodModal({ isOpen, onClose, onAdd }) {
 
     setLoading(true);
 
-    setTimeout(() => {
-      const newMethod = {
-        id: Date.now().toString(),
-        brand: form.number.startsWith("4") ? "Visa" : "Card",
-        last4: form.number.slice(-4),
-        expiry: form.expiry,
-        name: form.name,
-        isDefault: false,
-      };
+    try {
+      const data = await apiFetch("/client/payment-methods", {
+        method: "POST",
+        body: JSON.stringify({
+          name: form.name,
+          card_number: form.number,
+          expiry: form.expiry,
+          cvv: form.cvv,
+          address: form.address,
+        }),
+      });
 
-      onAdd(newMethod);
-      setLoading(false);
+      // Expect backend to return the created payment method object
+      if (typeof onAdd === "function") {
+        onAdd(data.paymentMethod || data);
+      }
+
+      resetForm();
       onClose();
-      setForm({ name: "", number: "", expiry: "", cvv: "", address: "" });
       alert("Payment method added successfully!");
-    }, 800);
+    } catch (err) {
+      console.error(err);
+      alert(err.message || "Failed to add payment method");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

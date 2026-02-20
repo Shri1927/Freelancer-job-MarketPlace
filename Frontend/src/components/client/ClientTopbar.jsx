@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import { Search, Bell, User, Settings } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -12,11 +13,52 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { useUser } from "@/contexts/UserContext.jsx"
+import { apiFetch } from "@/lib/apiClient"
 
 const ClientTopbar = () => {
   const { user } = useUser()
-  const displayName = user?.name || "Client"
-  const roleLabel = user?.role || "Client"
+  const [serverUser, setServerUser] = useState(null)
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    let isMounted = true
+
+    const loadUser = async () => {
+      // Only try hitting backend if we appear to be authenticated
+      const token = localStorage.getItem("authToken")
+      if (!token) return
+
+      setLoading(true)
+      try {
+        const data = await apiFetch("/client/settings", {
+          method: "GET",
+        })
+        if (!isMounted) return
+
+        // Prefer backend user object; keep profile/settings if needed elsewhere
+        if (data?.user) {
+          setServerUser(data.user)
+        }
+      } catch (err) {
+        console.error("Failed to load client settings:", err)
+      } finally {
+        if (isMounted) setLoading(false)
+      }
+    }
+
+    loadUser()
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
+
+  const effectiveUser = serverUser || user
+
+  const displayName = effectiveUser?.name || "Client"
+  const roleLabel = effectiveUser?.role || "Client"
+  const avatar = effectiveUser?.avatar || user?.avatar || ""
+
   const initials = displayName
     .split(" ")
     .map((n) => n[0])
@@ -46,7 +88,7 @@ const ClientTopbar = () => {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="flex items-center gap-2">
                 <Avatar className="w-8 h-8">
-                  <AvatarImage src={user?.avatar || ""} />
+                  <AvatarImage src={avatar} />
                   <AvatarFallback className="bg-green-100 text-green-700">
                     {initials}
                   </AvatarFallback>

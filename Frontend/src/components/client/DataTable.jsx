@@ -8,12 +8,6 @@ import {
 } from "@/components/ui/table"
 import EmptyState from "./EmptyState"
 
-/**
- * Simple reusable data table for SaaS-style lists.
- *
- * columns: [{ key, header, className, render?: (row) => ReactNode }]
- * data: array of objects
- */
 const DataTable = ({ columns, data, emptyTitle, emptyDescription }) => {
   if (!data?.length) {
     return (

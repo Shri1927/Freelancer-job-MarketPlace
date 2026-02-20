@@ -1,4 +1,5 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useSearchParams } from "react-router-dom"
 import {
   Briefcase,
   Home,
@@ -25,8 +26,17 @@ import FreelancerDashboard from "./FreelancerDashboard"
 // ... import other content components
 
 const FreelancerSidebar = () => {
+  const [searchParams, setSearchParams] = useSearchParams()
+  const viewParam = searchParams.get('view') || 'dashboard'
+  
   // State to track current page
-  const [currentPage, setCurrentPage] = useState('dashboard')
+  const [currentPage, setCurrentPage] = useState(viewParam)
+
+  // Update current page when URL query parameter changes
+  useEffect(() => {
+    const view = searchParams.get('view') || 'dashboard'
+    setCurrentPage(view)
+  }, [searchParams])
 
   // Function to render content based on current page
   const renderContent = () => {
@@ -86,7 +96,10 @@ const FreelancerSidebar = () => {
             <h4 className="text-xs font-semibold text-muted-foreground uppercase mb-3">Main Menu</h4>
             <div className="space-y-1">
               <button
-                onClick={() => setCurrentPage('dashboard')}
+                onClick={() => {
+                  setCurrentPage('dashboard')
+                  setSearchParams({ view: 'dashboard' })
+                }}
                 className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-colors ${
                   currentPage === 'dashboard' 
                     ? 'bg-primary/10 text-primary' 
@@ -100,7 +113,10 @@ const FreelancerSidebar = () => {
               </button>
 
               <button
-                onClick={() => setCurrentPage('jobs')}
+                onClick={() => {
+                  setCurrentPage('jobs')
+                  setSearchParams({ view: 'jobs' })
+                }}
                 className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-colors ${
                   currentPage === 'jobs' 
                     ? 'bg-primary/10 text-primary' 
@@ -114,7 +130,10 @@ const FreelancerSidebar = () => {
               </button>
 
               <button
-                onClick={() => setCurrentPage('proposals')}
+                onClick={() => {
+                  setCurrentPage('proposals')
+                  setSearchParams({ view: 'proposals' })
+                }}
                 className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-colors ${
                   currentPage === 'proposals' 
                     ? 'bg-primary/10 text-primary' 
@@ -129,7 +148,10 @@ const FreelancerSidebar = () => {
               </button>
 
               <button
-                onClick={() => setCurrentPage('projects')}
+                onClick={() => {
+                  setCurrentPage('projects')
+                  setSearchParams({ view: 'projects' })
+                }}
                 className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-colors ${
                   currentPage === 'projects' 
                     ? 'bg-primary/10 text-primary' 
@@ -144,7 +166,10 @@ const FreelancerSidebar = () => {
               </button>
 
               <button
-                onClick={() => setCurrentPage('messages')}
+                onClick={() => {
+                  setCurrentPage('messages')
+                  setSearchParams({ view: 'messages' })
+                }}
                 className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-colors ${
                   currentPage === 'messages' 
                     ? 'bg-primary/10 text-primary' 

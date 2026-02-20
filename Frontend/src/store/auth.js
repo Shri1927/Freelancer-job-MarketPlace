@@ -1,21 +1,20 @@
-// store/auth.js - Basic version for testing
 import { create } from 'zustand';
+import { apiFetch } from '@/lib/apiClient';
 
-export const useAuthStore = create((set, get) => ({
+export const useAuthStore = create((set) => ({
   user: null,
   loading: false,
 
   setUser: (user) => {
     set({ user });
-    // Store user info in localStorage for persistence
     if (user) {
       localStorage.setItem('userInfo', JSON.stringify({
         id: user.id,
         email: user.email,
         name: user.name,
         role: user.role,
-        userType: user.role, // DashboardRouter looks for userType
-        avatar: user.avatar
+        userType: user.role,
+        avatar: user.avatar,
       }));
     } else {
       localStorage.removeItem('userInfo');
@@ -24,20 +23,24 @@ export const useAuthStore = create((set, get) => ({
 
   signUp: async (email, password, name, role) => {
     try {
-      console.log('Auth store: Signing up user', { email, name, role });
-      
-      // Simulate API call - replace this with your actual authentication
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Mock successful response
-      const user = {
-        id: 'user-' + Date.now(),
-        email,
-        name,
-        role,
-        avatar: `https://ui-avatars.com/api/?name=${name}&background=0D8ABC&color=fff`
-      };
-      
+      const data = await apiFetch('/register', {
+        method: 'POST',
+        body: JSON.stringify({
+          name,
+          email,
+          password,
+          password_confirmation: password,
+          role,
+        }),
+      });
+
+      const token = data.token;
+      const user = data.user;
+
+      if (token) {
+        localStorage.setItem('authToken', token);
+      }
+
       set({ user });
       localStorage.setItem('userInfo', JSON.stringify({
         id: user.id,
@@ -45,32 +48,70 @@ export const useAuthStore = create((set, get) => ({
         name: user.name,
         role: user.role,
         userType: user.role,
-        avatar: user.avatar
+        avatar: user.avatar,
       }));
-      
+
       return { success: true, user };
-      
     } catch (error) {
-      console.error('Auth store error:', error);
-      return { 
-        success: false, 
-        error: error.message || 'Registration failed' 
+      console.error('Auth store signUp error:', error);
+      return {
+        success: false,
+        error: error.message || 'Registration failed',
+      };
+    }
+  },
+
+  signIn: async (email, password) => {
+    try {
+      const data = await apiFetch('/login', {
+        method: 'POST',
+        body: JSON.stringify({ email, password }),
+      });
+
+      const token = data.token;
+      const user = data.user;
+
+      if (token) {
+        localStorage.setItem('authToken', token);
+      }
+
+      set({ user });
+      localStorage.setItem('userInfo', JSON.stringify({
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        userType: user.role,
+        avatar: user.avatar,
+      }));
+
+      return { success: true, user };
+    } catch (error) {
+      console.error('Auth store signIn error:', error);
+      return {
+        success: false,
+        error: error.message || 'Login failed',
       };
     }
   },
 
   signInWithGoogle: async () => {
-    // Implement Google sign-in
     return { success: false, error: 'Google sign-in not implemented' };
   },
 
   signInWithFacebook: async () => {
-    // Implement Facebook sign-in
     return { success: false, error: 'Facebook sign-in not implemented' };
   },
 
-  signOut: () => {
+  signOut: async () => {
+    try {
+      await apiFetch('/logout', { method: 'POST' });
+    } catch (error) {
+      console.error('Logout error (ignored):', error);
+    }
+
     set({ user: null });
     localStorage.removeItem('userInfo');
-  }
+    localStorage.removeItem('authToken');
+  },
 }));

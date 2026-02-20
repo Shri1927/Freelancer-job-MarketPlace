@@ -78,6 +78,7 @@ const App = () => (
             <Route path="profile" element={<ClientProfilePage />} />
             <Route path="settings" element={<ClientSettings />} />
           </Route>
+          <Route path="/dashboard/freelancer" element={<FreelancerSidebar />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
           <Route path="/questions" element={<OnboardingQuestionnaire />} />

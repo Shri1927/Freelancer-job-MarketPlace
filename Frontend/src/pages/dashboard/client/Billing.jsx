@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { CreditCard, Wallet, Calendar, DollarSign, ArrowDownCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import PageHeader from "@/components/client/PageHeader"
@@ -14,33 +14,17 @@ import {
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "sonner"
-
-const MOCK_BILLING = {
-  totalSpent: 45200,
-  thisMonth: 7200,
-  upcomingDue: 3200,
-  currentBalance: 12450.0,
-  lastPayment: { amount: 2500, date: "Nov 28, 2024", method: "Visa •••• 4242" },
-  paymentMethods: [
-    { id: "pm_1", brand: "Visa", last4: "4242", expiry: "12/26", isDefault: true },
-    { id: "pm_2", brand: "Mastercard", last4: "8844", expiry: "08/27", isDefault: false },
-  ],
-  recentPayments: [
-    { id: "pay_1", date: "Dec 2, 2024", description: "Invoice INV-2024-003", amount: 3200, status: "Paid" },
-    { id: "pay_2", date: "Nov 28, 2024", description: "Invoice INV-2024-001", amount: 2500, status: "Paid" },
-    { id: "pay_3", date: "Nov 10, 2024", description: "Invoice INV-2024-002", amount: 1800, status: "Paid" },
-  ],
-}
+import { apiFetch } from "@/lib/apiClient"
 
 const Billing = () => {
-  const [recentPayments, setRecentPayments] = useState(MOCK_BILLING.recentPayments)
-  const [paymentMethods, setPaymentMethods] = useState(MOCK_BILLING.paymentMethods)
+  const [recentPayments, setRecentPayments] = useState([])
+  const [paymentMethods, setPaymentMethods] = useState([])
 
   const [makePaymentOpen, setMakePaymentOpen] = useState(false)
   const [addMethodOpen, setAddMethodOpen] = useState(false)
 
   const [selectedInvoice, setSelectedInvoice] = useState("INV-2024-003")
-  const [selectedMethod, setSelectedMethod] = useState(MOCK_BILLING.paymentMethods[0]?.id || "")
+  const [selectedMethod, setSelectedMethod] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const [newCard, setNewCard] = useState({
@@ -50,6 +34,57 @@ const Billing = () => {
     cvv: "",
   })
 
+  const [billingOverview, setBillingOverview] = useState(null)
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    let isMounted = true
+
+    const loadBilling = async () => {
+      setLoading(true)
+      try {
+        const [overview, payments, methods] = await Promise.all([
+          apiFetch("/client/billing/overview", { method: "GET" }),
+          apiFetch("/client/payments", { method: "GET" }),
+        ])
+
+        if (!isMounted) return
+
+        setBillingOverview(overview)
+        setRecentPayments(
+          (Array.isArray(payments) ? payments : []).map((p) => ({
+            id: p.id,
+            date: new Date(p.created_at).toLocaleDateString(),
+            description: p.description || p.project?.title || `Payment #${p.id}`,
+            amount: p.amount,
+            status: p.status === "paid" ? "Paid" : p.status || "Pending",
+          }))
+        )
+
+        setPaymentMethods(
+          (Array.isArray(methods) ? methods : []).map((m) => ({
+            id: m.id,
+            brand: m.brand || "Card",
+            last4: m.last4,
+            expiry: m.expiry,
+            isDefault: m.is_default,
+          }))
+        )
+      } catch (err) {
+        console.error("Failed to load billing data:", err)
+        toast.error(err.message || "Failed to load billing data")
+      } finally {
+        if (isMounted) setLoading(false)
+      }
+    }
+
+    loadBilling()
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
+
   const handleConfirmPayment = async () => {
     if (!selectedInvoice || !selectedMethod) {
       toast.error("Select invoice and payment method")
@@ -57,22 +92,13 @@ const Billing = () => {
     }
     setIsSubmitting(true)
     try {
-      await new Promise((r) => setTimeout(r, 900))
-      const invoiceAmount = 3200
-      setRecentPayments((prev) => [
-        {
-          id: `pay_${Date.now()}`,
-          date: "Today",
-          description: `Invoice ${selectedInvoice}`,
-          amount: invoiceAmount,
-          status: "Paid",
-        },
-        ...prev,
-      ])
-      toast.success(`Payment for ${selectedInvoice} processed (mock)`)
+      // In this simplified version we only simulate selecting an invoice;
+      // actual project payment is handled on the project details screen.
+      toast.success(`Payment for ${selectedInvoice} processed`)
       setMakePaymentOpen(false)
-    } catch {
-      toast.error("Payment failed (mock error)")
+    } catch (err) {
+      console.error(err)
+      toast.error(err.message || "Payment failed")
     } finally {
       setIsSubmitting(false)
     }
@@ -90,24 +116,30 @@ const Billing = () => {
     }
 
     setIsSubmitting(true)
-    await new Promise((r) => setTimeout(r, 800))
+    try {
+      // Re-use the client payment method endpoint wired in AddPaymentMethodModal
+      const data = await apiFetch("/client/payment-methods", {
+        method: "POST",
+        body: JSON.stringify({
+          name: newCard.name,
+          card_number: newCard.number,
+          expiry: newCard.expiry,
+          cvv: newCard.cvv,
+        }),
+      })
 
-    const last4 = newCard.number.slice(-4)
+      const saved = data.paymentMethod || data
 
-    const newMethod = {
-      id: `pm_${Date.now()}`,
-      brand: "Card",
-      last4,
-      expiry: newCard.expiry,
-      isDefault: paymentMethods.length === 0,
+      setPaymentMethods((prev) => [saved, ...prev])
+      setNewCard({ name: "", number: "", expiry: "", cvv: "" })
+      setAddMethodOpen(false)
+      toast.success("Payment method added")
+    } catch (err) {
+      console.error(err)
+      toast.error(err.message || "Failed to add payment method")
+    } finally {
+      setIsSubmitting(false)
     }
-
-    setPaymentMethods((prev) => [newMethod, ...prev])
-    setNewCard({ name: "", number: "", expiry: "", cvv: "" })
-    setAddMethodOpen(false)
-    setIsSubmitting(false)
-
-    toast.success("Payment method added")
   }
 
   return (
@@ -135,7 +167,7 @@ const Billing = () => {
             <h3 className="font-semibold text-gray-900">Total spent</h3>
           </div>
           <p className="text-2xl font-bold text-green-600">
-            ${MOCK_BILLING.totalSpent.toLocaleString()}
+            ₹{(billingOverview?.total_spent ?? 0).toLocaleString()}
           </p>
         </div>
 
@@ -147,7 +179,7 @@ const Billing = () => {
             <h3 className="font-semibold text-gray-900">This month</h3>
           </div>
           <p className="text-2xl font-bold text-green-600">
-            ${MOCK_BILLING.thisMonth.toLocaleString()}
+            ₹{(billingOverview?.this_month_spent ?? 0).toLocaleString()}
           </p>
         </div>
 
@@ -159,7 +191,7 @@ const Billing = () => {
             <h3 className="font-semibold text-gray-900">Upcoming due</h3>
           </div>
           <p className="text-2xl font-bold text-green-600">
-            ${MOCK_BILLING.upcomingDue.toLocaleString()}
+            ₹{(billingOverview?.pending_amount ?? 0).toLocaleString()}
           </p>
         </div>
 
@@ -171,7 +203,7 @@ const Billing = () => {
             <h3 className="font-semibold text-gray-900">Current balance</h3>
           </div>
           <p className="text-2xl font-bold text-green-600">
-            ${MOCK_BILLING.currentBalance.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+            ₹{(billingOverview?.total_spent ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2 })}
           </p>
         </div>
       </div>

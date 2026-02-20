@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react"
 import {
   DollarSign,
   FileText,
@@ -9,91 +10,60 @@ import {
   Bell,
 } from "lucide-react"
 import PageHeader from "@/components/client/PageHeader"
+import { apiFetch } from "@/lib/apiClient"
 
-const MOCK_ACTIVITIES = [
-  {
-    id: 1,
-    type: "invoice_paid",
-    title: "Invoice paid",
-    description: "INV-2024-003 — $3,200",
-    time: "2 hours ago",
-    icon: DollarSign,
-    iconBg: "bg-green-100",
-    iconColor: "text-green-600",
-  },
-  {
-    id: 2,
-    type: "project_created",
-    title: "Project created",
-    description: "Website Redesign — Acme Corp",
-    time: "5 hours ago",
-    icon: Briefcase,
-    iconBg: "bg-emerald-100",
-    iconColor: "text-emerald-600",
-  },
-  {
-    id: 3,
-    type: "message_received",
-    title: "Message received",
-    description: "From John D. — Re: Milestone delivery",
-    time: "Yesterday, 4:32 PM",
-    icon: MessageSquare,
-    iconBg: "bg-blue-100",
-    iconColor: "text-blue-600",
-  },
-  {
-    id: 4,
-    type: "milestone_completed",
-    title: "Milestone completed",
-    description: "Phase 1 — Design mockups approved",
-    time: "Yesterday, 11:00 AM",
-    icon: CheckCircle,
-    iconBg: "bg-green-100",
-    iconColor: "text-green-600",
-  },
-  {
-    id: 5,
-    type: "freelancer_added",
-    title: "Freelancer added to project",
-    description: "Sarah M. — UX Designer",
-    time: "Jan 29, 2025",
-    icon: UserPlus,
-    iconBg: "bg-purple-100",
-    iconColor: "text-purple-600",
-  },
-  {
-    id: 6,
-    type: "payment_method",
-    title: "Payment method updated",
-    description: "Visa •••• 4242 set as default",
-    time: "Jan 28, 2025",
-    icon: CreditCard,
-    iconBg: "bg-amber-100",
-    iconColor: "text-amber-600",
-  },
-  {
-    id: 7,
-    type: "invoice_issued",
-    title: "Invoice issued",
-    description: "INV-2024-004 — $950 (Pending)",
-    time: "Jan 27, 2025",
-    icon: FileText,
-    iconBg: "bg-gray-100",
-    iconColor: "text-gray-600",
-  },
-  {
-    id: 8,
-    type: "notification",
-    title: "Notification preferences updated",
-    description: "Email alerts for payments enabled",
-    time: "Jan 26, 2025",
-    icon: Bell,
-    iconBg: "bg-slate-100",
-    iconColor: "text-slate-600",
-  },
-]
+const iconForType = (type) => {
+  switch (type) {
+    case "payment_made":
+    case "invoice_paid":
+      return { icon: DollarSign, bg: "bg-green-100", color: "text-green-600" }
+    case "project_created":
+    case "project_completed":
+      return { icon: Briefcase, bg: "bg-emerald-100", color: "text-emerald-600" }
+    case "message_sent":
+    case "message_received":
+      return { icon: MessageSquare, bg: "bg-blue-100", color: "text-blue-600" }
+    case "milestone_completed":
+      return { icon: CheckCircle, bg: "bg-green-100", color: "text-green-600" }
+    case "freelancer_added":
+      return { icon: UserPlus, bg: "bg-purple-100", color: "text-purple-600" }
+    case "payment_method":
+      return { icon: CreditCard, bg: "bg-amber-100", color: "text-amber-600" }
+    case "invoice_issued":
+      return { icon: FileText, bg: "bg-gray-100", color: "text-gray-600" }
+    default:
+      return { icon: Bell, bg: "bg-slate-100", color: "text-slate-600" }
+  }
+}
 
 const ActivityLog = () => {
+  const [activities, setActivities] = useState([])
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    let isMounted = true
+
+    const loadActivities = async () => {
+      setLoading(true)
+      try {
+        const data = await apiFetch("/client/activity-log", { method: "GET" })
+        if (!isMounted) return
+
+        setActivities(Array.isArray(data) ? data : [])
+      } catch (err) {
+        console.error("Failed to load activity log:", err)
+      } finally {
+        if (isMounted) setLoading(false)
+      }
+    }
+
+    loadActivities()
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
+
   return (
     <div className="space-y-8">
       <PageHeader
@@ -105,32 +75,41 @@ const ActivityLog = () => {
         <div className="relative">
           <div className="absolute left-8 top-0 bottom-0 w-px bg-green-100" />
           <div className="divide-y divide-green-100 relative z-10">
-            {MOCK_ACTIVITIES.map((activity) => {
-              const Icon = activity.icon
-              return (
-                <div
-                  key={activity.id}
-                  className="flex items-start gap-4 p-4 hover:bg-gray-50/50 transition-colors"
-                >
-                  <div className="relative flex-shrink-0">
-                    <div
-                      className={`w-10 h-10 rounded-lg flex items-center justify-center ${activity.iconBg} ${activity.iconColor}`}
-                    >
-                      <Icon className="w-5 h-5" />
+            {loading && activities.length === 0 ? (
+              <div className="p-4 text-sm text-gray-500">Loading activity...</div>
+            ) : activities.length === 0 ? (
+              <div className="p-4 text-sm text-gray-500">No recent activity yet.</div>
+            ) : (
+              activities.map((activity) => {
+                const meta = iconForType(activity.type)
+                const Icon = meta.icon
+                return (
+                  <div
+                    key={activity.id}
+                    className="flex items-start gap-4 p-4 hover:bg-gray-50/50 transition-colors"
+                  >
+                    <div className="relative flex-shrink-0">
+                      <div
+                        className={`w-10 h-10 rounded-lg flex items-center justify-center ${meta.bg} ${meta.color}`}
+                      >
+                        <Icon className="w-5 h-5" />
+                      </div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-gray-900">
+                        {activity.title}
+                      </p>
+                      <p className="text-sm text-gray-600 mt-0.5">
+                        {activity.description}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {new Date(activity.created_at).toLocaleString()}
+                      </p>
                     </div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-gray-900">
-                      {activity.title}
-                    </p>
-                    <p className="text-sm text-gray-600 mt-0.5">
-                      {activity.description}
-                    </p>
-                    <p className="text-xs text-gray-500 mt-1">{activity.time}</p>
-                  </div>
-                </div>
-              )
-            })}
+                )
+              })
+            )}
           </div>
         </div>
       </div>

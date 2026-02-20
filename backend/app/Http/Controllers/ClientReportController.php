@@ -62,7 +62,7 @@ class ClientReportController extends Controller
                 Carbon::now()->subMonths(5)->startOfMonth(),
                 Carbon::now()->endOfMonth()
             ])
-            ->selectRaw('MONTH(created_at) as month, SUM(amount) as total')
+            ->selectRaw("CAST(strftime('%m', created_at) AS INTEGER) as month, SUM(amount) as total")
             ->groupBy('month')
             ->orderBy('month')
             ->get();
@@ -79,7 +79,7 @@ class ClientReportController extends Controller
                 Carbon::now()->subMonths(5)->startOfMonth(),
                 Carbon::now()->endOfMonth()
             ])
-            ->selectRaw('MONTH(created_at) as month, COUNT(*) as count')
+            ->selectRaw("CAST(strftime('%m', created_at) AS INTEGER) as month, COUNT(*) as count")
             ->groupBy('month')
             ->orderBy('month')
             ->get();

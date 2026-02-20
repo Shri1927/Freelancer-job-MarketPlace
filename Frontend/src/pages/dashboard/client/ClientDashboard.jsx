@@ -1,3 +1,4 @@
+import { useEffect, useMemo, useState } from "react"
 import {
   Briefcase,
   Clock,
@@ -23,36 +24,12 @@ import {
 import StatCard from "@/components/client/StatCard"
 import PageHeader from "@/components/client/PageHeader"
 import { useUser } from "@/contexts/UserContext.jsx"
-
-const MOCK_STATS = [
-  { icon: Briefcase, label: "Active Projects", value: "8", change: "+2" },
-  { icon: Clock, label: "Pending Actions", value: "5", change: "+1" },
-  { icon: MessageSquare, label: "Unread Messages", value: "12", change: "+3" },
-  { icon: DollarSign, label: "Total Spent", value: "$45,200", change: "+$2,500" },
-  { icon: CheckCircle, label: "Completed", value: "24", change: "+3" },
-  { icon: AlertCircle, label: "In Review", value: "6", change: "-1", changeType: "negative" },
-]
-
-const PIE_DATA = [
-  { name: "Completed", value: 24, fill: "#22c55e" },
-  { name: "Active", value: 8, fill: "#15803d" },
-  { name: "In Review", value: 6, fill: "#f97316" },
-  { name: "On Hold", value: 2, fill: "#ef4444" },
-]
-
-const SPENDING_DATA = [
-  { month: "Jan", amount: 4500 },
-  { month: "Feb", amount: 5200 },
-  { month: "Mar", amount: 4800 },
-  { month: "Apr", amount: 6100 },
-  { month: "May", amount: 5500 },
-  { month: "Jun", amount: 7200 },
-]
+import { apiFetch } from "@/lib/apiClient"
 
 const PieTooltip = ({ active, payload }) => {
   if (!active || !payload?.length) return null
   const item = payload[0]
-  const total = PIE_DATA.reduce((s, d) => s + d.value, 0)
+  const total = item?.payload?.__total || 0
   const pct = total ? ((item.value / total) * 100).toFixed(1) : 0
   return (
     <div className="rounded-lg border border-green-200 bg-white px-3 py-2 shadow-md">
@@ -80,6 +57,118 @@ const ClientDashboard = () => {
   const { user } = useUser()
   const name = user?.name || "Client"
 
+  const [summary, setSummary] = useState(null)
+  const [statusData, setStatusData] = useState([])
+  const [spendingData, setSpendingData] = useState([])
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    let isMounted = true
+
+    const loadDashboard = async () => {
+      setLoading(true)
+      try {
+        const data = await apiFetch("/client/dashboard", { method: "GET" })
+        if (!isMounted) return
+
+        setSummary(data.summary || {})
+
+        const rawStatus = Array.isArray(data.charts?.project_status)
+          ? data.charts.project_status
+          : []
+
+        const totalStatus = rawStatus.reduce((sum, row) => sum + (row.count || 0), 0)
+
+        const mappedStatus = rawStatus.map((row) => {
+          const name =
+            row.status === "completed"
+              ? "Completed"
+              : row.status === "active"
+              ? "Active"
+              : row.status === "in_review"
+              ? "In Review"
+              : row.status || "Other"
+
+          const fill =
+            row.status === "completed"
+              ? "#22c55e"
+              : row.status === "active"
+              ? "#15803d"
+              : row.status === "in_review"
+              ? "#f97316"
+              : "#e5e7eb"
+
+          return {
+            name,
+            value: row.count || 0,
+            fill,
+            __total: totalStatus,
+          }
+        })
+
+        setStatusData(mappedStatus)
+
+        const rawSpending = Array.isArray(data.charts?.spending_trend)
+          ? data.charts.spending_trend
+          : []
+
+        const mappedSpending = rawSpending.map((row) => ({
+          month: String(row.month),
+          amount: row.total || 0,
+        }))
+
+        setSpendingData(mappedSpending)
+      } catch (err) {
+        console.error("Failed to load client dashboard:", err)
+      } finally {
+        if (isMounted) setLoading(false)
+      }
+    }
+
+    loadDashboard()
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
+
+  const stats = useMemo(() => {
+    if (!summary) return []
+
+    return [
+      {
+        icon: Briefcase,
+        label: "Active Projects",
+        value: String(summary.active_projects ?? 0),
+      },
+      {
+        icon: CheckCircle,
+        label: "Completed",
+        value: String(summary.completed_projects ?? 0),
+      },
+      {
+        icon: AlertCircle,
+        label: "In Review",
+        value: String(summary.in_review_projects ?? 0),
+      },
+      {
+        icon: Clock,
+        label: "Pending Actions",
+        value: String(summary.pending_actions ?? 0),
+      },
+      {
+        icon: MessageSquare,
+        label: "Unread Messages",
+        value: String(summary.unread_messages ?? 0),
+      },
+      {
+        icon: DollarSign,
+        label: "Total Spent",
+        value: `₹${(summary.total_spent ?? 0).toLocaleString()}`,
+      },
+    ]
+  }, [summary])
+
   return (
     <div className="space-y-8">
       <PageHeader
@@ -87,18 +176,20 @@ const ClientDashboard = () => {
         description="Overview of your projects, activity, and spending on FreelanceHub."
       />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-        {MOCK_STATS.map((stat, i) => (
-          <StatCard
-            key={i}
-            icon={stat.icon}
-            label={stat.label}
-            value={stat.value}
-            change={stat.change}
-            changeType={stat.changeType}
-          />
-        ))}
-      </div>
+      {loading && !summary ? (
+        <div className="text-sm text-gray-500">Loading dashboard...</div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+          {stats.map((stat, i) => (
+            <StatCard
+              key={i}
+              icon={stat.icon}
+              label={stat.label}
+              value={stat.value}
+            />
+          ))}
+        </div>
+      )}
 
       <div className="grid lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-lg border border-green-200 p-6 shadow-sm">
@@ -109,7 +200,7 @@ const ClientDashboard = () => {
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
-                  data={PIE_DATA}
+                  data={statusData}
                   cx="50%"
                   cy="50%"
                   innerRadius={60}
@@ -121,8 +212,8 @@ const ClientDashboard = () => {
                     `${name} ${(percent * 100).toFixed(0)}%`
                   }
                 >
-                  {PIE_DATA.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.fill} />
+                    {statusData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.fill} />
                   ))}
                 </Pie>
                 <Tooltip content={<PieTooltip />} />
@@ -138,7 +229,7 @@ const ClientDashboard = () => {
           </h3>
           <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={SPENDING_DATA}>
+              <LineChart data={spendingData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                 <XAxis dataKey="month" stroke="#6b7280" />
                 <YAxis

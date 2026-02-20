@@ -5,63 +5,7 @@ import ProjectCard from "@/components/client/ProjectCard"
 import PageHeader from "@/components/client/PageHeader"
 import EmptyState from "@/components/client/EmptyState"
 import { cn } from "@/lib/utils"
-
-const MOCK_PROJECTS = [
-  {
-    id: "1",
-    name: "E-commerce Website Redesign",
-    description:
-      "Full redesign of the e-commerce platform with modern UI, improved checkout flow, and mobile responsiveness.",
-    status: "active",
-    deadline: "Dec 15, 2024",
-    progress: 72,
-  },
-  {
-    id: "2",
-    name: "Mobile App Development",
-    description:
-      "Native iOS and Android app for the fitness product. Integration with wearables and cloud sync.",
-    status: "in-review",
-    deadline: "Jan 20, 2025",
-    progress: 58,
-  },
-  {
-    id: "3",
-    name: "Logo & Brand Identity",
-    description:
-      "Complete brand identity including logo, color palette, typography, and brand guidelines.",
-    status: "completed",
-    deadline: "Nov 1, 2024",
-    progress: 100,
-  },
-  {
-    id: "4",
-    name: "API Integration Project",
-    description:
-      "Integration of third-party payment and shipping APIs into the existing backend with full documentation.",
-    status: "active",
-    deadline: "Dec 28, 2024",
-    progress: 40,
-  },
-  {
-    id: "5",
-    name: "Content Marketing Strategy",
-    description:
-      "Six-month content strategy, including blog calendar, social media plan, and SEO recommendations.",
-    status: "on-hold",
-    deadline: "Jan 10, 2025",
-    progress: 20,
-  },
-  {
-    id: "6",
-    name: "Data Analytics Dashboard",
-    description:
-      "Internal analytics dashboard with real-time KPIs, charts, and export functionality for leadership.",
-    status: "completed",
-    deadline: "Oct 15, 2024",
-    progress: 100,
-  },
-]
+import { apiFetch } from "@/lib/apiClient"
 
 const FILTERS = [
   { label: "All", value: "all" },
@@ -74,17 +18,47 @@ const FILTERS = [
 const Projects = () => {
   const [filter, setFilter] = useState("all")
   const [isLoading, setIsLoading] = useState(true)
+  const [projects, setProjects] = useState([])
 
   useEffect(() => {
-    // Simulate initial loading state for nicer UX
-    const timer = setTimeout(() => setIsLoading(false), 600)
-    return () => clearTimeout(timer)
+    let isMounted = true
+
+    const loadProjects = async () => {
+      setIsLoading(true)
+      try {
+        const data = await apiFetch("/client/projects", { method: "GET" })
+        if (!isMounted) return
+
+        const normalized = (Array.isArray(data) ? data : data?.projects || []).map(
+          (p) => ({
+            id: p.id,
+            name: p.title || p.name,
+            description: p.description,
+            status: p.status || "active",
+            deadline: p.deadline || p.due_date,
+            progress: p.progress ?? 0,
+          })
+        )
+
+        setProjects(normalized)
+      } catch (err) {
+        console.error("Failed to load client projects:", err)
+      } finally {
+        if (isMounted) setIsLoading(false)
+      }
+    }
+
+    loadProjects()
+
+    return () => {
+      isMounted = false
+    }
   }, [])
 
   const filtered = useMemo(() => {
-    if (filter === "all") return MOCK_PROJECTS
-    return MOCK_PROJECTS.filter((p) => p.status === filter)
-  }, [filter])
+    if (filter === "all") return projects
+    return projects.filter((p) => p.status === filter)
+  }, [filter, projects])
 
   return (
     <div className="space-y-6">

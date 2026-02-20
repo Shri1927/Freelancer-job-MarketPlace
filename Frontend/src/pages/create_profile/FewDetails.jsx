@@ -116,18 +116,24 @@ export default function FewDetails({ onBack, onNext, onSkip, showIndividualProgr
   const animateTransition = (callback) => {
     setIsAnimating(true);
     setTimeout(() => {
-      callback();
+      if (callback && typeof callback === 'function') {
+        callback();
+      }
       setTimeout(() => setIsAnimating(false), 300);
     }, 300);
   };
 
   const handleNext = () => {
-    animateTransition(onNext);
+    if (onNext && typeof onNext === 'function') {
+      animateTransition(onNext);
+    }
     navigate('/dashboard'); 
   };
 
   const handleBack = () => {
-    animateTransition(onBack);
+    if (onBack && typeof onBack === 'function') {
+      animateTransition(onBack);
+    }
   };
 
   const handleInputChange = (field, value) => {

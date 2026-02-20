@@ -5,14 +5,7 @@ import DataTable from "@/components/client/DataTable"
 import StatusBadge from "@/components/client/StatusBadge"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
-
-const DEFAULT_INVOICES = [
-  { id: "INV-2024-001", date: "Nov 28, 2024", amount: 2500, status: "Paid" },
-  { id: "INV-2024-002", date: "Nov 15, 2024", amount: 1800, status: "Paid" },
-  { id: "INV-2024-003", date: "Dec 5, 2024", amount: 3200, status: "Unpaid" },
-  { id: "INV-2024-004", date: "Oct 30, 2024", amount: 950, status: "Overdue" },
-  { id: "INV-2024-005", date: "Oct 10, 2024", amount: 4100, status: "Paid" },
-]
+import { apiFetch } from "@/lib/apiClient"
 
 const columns = [
   {
@@ -62,10 +55,46 @@ const columns = [
 ]
 
 const Invoices = () => {
-  const [invoices] = useState(() => {
-    // In a real app this would load from API or localStorage
-    return DEFAULT_INVOICES
-  })
+  const [invoices, setInvoices] = useState([])
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    let isMounted = true
+
+    const loadInvoices = async () => {
+      setLoading(true)
+      try {
+        const data = await apiFetch("/client/invoices", {
+          method: "GET",
+        })
+
+        if (!isMounted) return
+
+        // Expecting array of invoices from backend
+        const normalized = (Array.isArray(data) ? data : data?.invoices || []).map(
+          (inv) => ({
+            id: inv.invoice_number || inv.id,
+            date: inv.invoice_date || inv.date,
+            amount: inv.amount,
+            status: (inv.status || "").charAt(0).toUpperCase() + (inv.status || "").slice(1),
+          })
+        )
+
+        setInvoices(normalized)
+      } catch (err) {
+        console.error("Failed to load invoices", err)
+        toast.error(err.message || "Failed to load invoices")
+      } finally {
+        if (isMounted) setLoading(false)
+      }
+    }
+
+    loadInvoices()
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
 
   return (
     <div className="space-y-6">
@@ -74,12 +103,18 @@ const Invoices = () => {
         description="View, filter, and download invoices for your projects."
       />
 
-      <DataTable
-        columns={columns}
-        data={invoices}
-        emptyTitle="No invoices yet"
-        emptyDescription="You’ll see invoices here once you start working with freelancers."
-      />
+      {loading ? (
+        <div className="bg-white rounded-lg border border-green-200 p-6 text-sm text-gray-600">
+          Loading invoices...
+        </div>
+      ) : (
+        <DataTable
+          columns={columns}
+          data={invoices}
+          emptyTitle="No invoices yet"
+          emptyDescription="You’ll see invoices here once you start working with freelancers."
+        />
+      )}
     </div>
   )
 }

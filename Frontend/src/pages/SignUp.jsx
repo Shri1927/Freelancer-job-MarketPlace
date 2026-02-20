@@ -56,9 +56,6 @@ export default function SignUp() {
     setLoading(true);
 
     try {
-      console.log('Starting signup process...');
-      console.log('Form data:', formData);
-
       const result = await signUp(
         formData.email,
         formData.password,
@@ -66,21 +63,7 @@ export default function SignUp() {
         formData.role
       );
 
-      console.log('Signup result:', result);
-
       if (result && result.success) {
-        console.log('Signup successful! Storing user and redirecting...');
-        
-        // Store user data in localStorage
-        localStorage.setItem('userInfo', JSON.stringify({
-          id: result.user.id,
-          email: result.user.email,
-          name: result.user.name,
-          role: result.user.role,
-          userType: result.user.role,
-          avatar: result.user.avatar
-        }));
-
         // Redirect to different pages based on role
         if (formData.role === 'freelancer') {
           navigate('/questions');
