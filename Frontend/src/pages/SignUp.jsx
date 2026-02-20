@@ -56,6 +56,9 @@ export default function SignUp() {
     setLoading(true);
 
     try {
+      console.log('[SignUp] Starting signup process...');
+      console.log('[SignUp] Form data:', formData);
+
       const result = await signUp(
         formData.email,
         formData.password,
@@ -63,22 +66,32 @@ export default function SignUp() {
         formData.role
       );
 
+      console.log('[SignUp] Signup result:', result);
+
       if (result && result.success) {
-        // Redirect to different pages based on role
-        if (formData.role === 'freelancer') {
-          navigate('/questions');
-        } else if (formData.role === 'client') {
-          navigate('/clientaccount');
-        } else {
-          navigate('/dashboard');
-        }
+        console.log('[SignUp] Signup successful! Storing user and redirecting...');
+
+        const userPayload = {
+          id: result.user.id,
+          email: result.user.email,
+          name: result.user.name,
+          role: result.user.role,
+          userType: result.user.role,
+          avatar: result.user.avatar
+        };
+
+        localStorage.setItem('userInfo', JSON.stringify(userPayload));
+
+        console.log('[SignUp] userType:', userPayload.userType);
+        console.log('[SignUp] Redirecting to /dashboard');
+        navigate('/dashboard');
       } else {
         const errorMessage = result?.error || 'Failed to create account. Please try again.';
         setError(errorMessage);
-        console.error('Signup failed:', errorMessage);
+        console.error('[SignUp] Signup failed:', errorMessage);
       }
     } catch (err) {
-      console.error('Unexpected error during signup:', err);
+      console.error('[SignUp] Unexpected error during signup:', err);
       setError('An unexpected error occurred. Please try again.');
     } finally {
       setLoading(false);

@@ -1,21 +1,22 @@
 import { useEffect, useMemo, useState } from "react"
+import { useNavigate } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
-import ProjectCard from "@/components/client/ProjectCard"
 import PageHeader from "@/components/client/PageHeader"
 import EmptyState from "@/components/client/EmptyState"
+import StatusBadge from "@/components/client/StatusBadge"
 import { cn } from "@/lib/utils"
 import { apiFetch } from "@/lib/apiClient"
 
 const FILTERS = [
   { label: "All", value: "all" },
-  { label: "Active", value: "active" },
-  { label: "In Review", value: "in-review" },
+  { label: "Open", value: "open" },
+  { label: "In Progress", value: "in-progress" },
   { label: "Completed", value: "completed" },
-  { label: "On Hold", value: "on-hold" },
 ]
 
 const Projects = () => {
+  const navigate = useNavigate()
   const [filter, setFilter] = useState("all")
   const [isLoading, setIsLoading] = useState(true)
   const [projects, setProjects] = useState([])
@@ -57,7 +58,13 @@ const Projects = () => {
 
   const filtered = useMemo(() => {
     if (filter === "all") return projects
-    return projects.filter((p) => p.status === filter)
+    return projects.filter((p) => {
+      const status = (p.status || "").toString().toLowerCase()
+      if (filter === "open") return status === "open"
+      if (filter === "in-progress") return status === "in progress" || status === "in-progress"
+      if (filter === "completed") return status === "completed"
+      return true
+    })
   }, [filter, projects])
 
   return (
@@ -97,6 +104,19 @@ const Projects = () => {
             </div>
           ))}
         </div>
+      ) : projects.length === 0 ? (
+        <EmptyState
+          title="No projects yet"
+          description="Post your first job to start working with top freelancers on FreelanceHub."
+          action={
+            <Button
+              className="bg-green-600 hover:bg-green-700 text-white"
+              onClick={() => navigate("/dashboard/client/post-job")}
+            >
+              Post your first job
+            </Button>
+          }
+        />
       ) : filtered.length === 0 ? (
         <EmptyState
           title="No projects match this filter"
@@ -104,9 +124,55 @@ const Projects = () => {
         />
       ) : (
         <div className="space-y-4">
-          {filtered.map((project) => (
-            <ProjectCard key={project.id} project={project} />
-          ))}
+          {filtered.map((project) => {
+            const createdDate = project.deadline
+              ? new Date(project.deadline)
+              : null
+            const formattedDate = createdDate
+              ? createdDate.toLocaleDateString()
+              : "—"
+
+            return (
+              <div
+                key={project.id}
+                className="bg-white rounded-lg border border-green-200 p-5 hover:shadow-md transition-all"
+              >
+                <div className="flex items-start justify-between gap-4 mb-3">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-1 truncate">
+                      {project.name}
+                    </h3>
+                    <p className="text-sm text-gray-600 line-clamp-2">
+                      {project.description}
+                    </p>
+                  </div>
+                  <div className="flex flex-col items-end gap-1">
+                    <StatusBadge status={project.status} type="project" />
+                    <span className="text-xs text-gray-500 whitespace-nowrap">
+                      {formattedDate !== "—"
+                        ? `Due ${formattedDate}`
+                        : "—"}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="mt-3 flex flex-wrap items-center justify-between gap-3 text-sm text-gray-700">
+                  <div>
+                    <span className="font-medium text-gray-900">Progress: </span>
+                    <span>{project.progress ?? 0}%</span>
+                  </div>
+                  {project.deadline && (
+                    <div className="text-gray-600">
+                      <span className="font-medium text-gray-900">
+                        Deadline:{" "}
+                      </span>
+                      <span>{formattedDate}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )
+          })}
         </div>
       )}
     </div>
